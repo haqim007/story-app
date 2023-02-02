@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextInputHintAppearance" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:fontFamily">Roboto-Medium</item>
+        <item name="fontFamily">Roboto-Medium</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextInputEditAppearance" parent="">
+        <item name="android:fontFamily">Roboto-Medium</item>
+        <item name="fontFamily">Roboto-Medium</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textAppearance">?attr/textAppearanceBodyLarge</item>
+    </style>
+</resources>
