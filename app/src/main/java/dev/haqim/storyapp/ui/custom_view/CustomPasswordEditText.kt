@@ -75,7 +75,7 @@ class CustomPasswordEditText: TextInputLayout{
             return false
         }
 
-        if(this.textInputEditText.text != null && this.textInputEditText.text!!.length < 7){
+        if(this.textInputEditText.text != null && this.textInputEditText.text!!.length < 8){
             return false
         }
 
