@@ -45,4 +45,12 @@
     <string name="logout">Logout</string>
     <string name="home">Home</string>
     <string name="type_email_here">Type email here</string>
+    <string name="click_to_add_new_story">Click to add new story</string>
+    <string name="map">Map</string>
+    <string name="retry">Retry</string>
+    <string name="title_activity_maps">Story Map</string>
+    <string name="share_location">Share location</string>
+    <string name="please_wait">"Please wait "</string>
+    <string name="exceed_max_size">Max size is 1 MB</string>
+    <string name="try_again">Try again</string>
 </resources>

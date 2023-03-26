@@ -1,11 +1,13 @@
 package dev.haqim.storyapp.ui.add_story
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
@@ -14,19 +16,19 @@ import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
 import dev.haqim.storyapp.R
 import dev.haqim.storyapp.data.mechanism.Resource
 import dev.haqim.storyapp.databinding.ActivityAddStoryBinding
 import dev.haqim.storyapp.di.Injection
-import dev.haqim.storyapp.helper.util.rotateBitmap
-import dev.haqim.storyapp.helper.util.uriToFile
+import dev.haqim.storyapp.helper.util.*
 import dev.haqim.storyapp.ui.CameraActivity
 import dev.haqim.storyapp.ui.CameraActivity.Companion.IS_BACK_CAMERA
 import dev.haqim.storyapp.ui.base.BaseActivity
 import dev.haqim.storyapp.ui.main.MainActivity
-import dev.haqim.storyapp.ui.mechanism.InputValidation
-import dev.haqim.storyapp.ui.mechanism.ResultInput
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -39,6 +41,7 @@ class AddStoryActivity : BaseActivity() {
     private val viewModel: AddStoryViewModel by viewModels{
         Injection.provideViewModelProvider(this)
     }
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -76,6 +79,8 @@ class AddStoryActivity : BaseActivity() {
         supportActionBar?.title = getString(R.string.new_story)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
         val uiState = viewModel.uiState
         val uiAction = {action: AddStoryUiAction -> viewModel.processAction(action)}
 
@@ -89,12 +94,48 @@ class AddStoryActivity : BaseActivity() {
 
         bindSetDescription(uiState, uiAction)
 
+        bindShareLocation(uiAction)
+
         if (!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(
                 this,
                 REQUIRED_PERMISSIONS,
                 REQUEST_CODE_PERMISSIONS
             )
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun bindShareLocation(
+        uiAction: (AddStoryUiAction) -> Boolean
+    ) {
+
+        binding.switchToShare.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked){
+                if(checkPermissionLocationAccess()){
+                    fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                        if(location != null){
+                            uiAction(AddStoryUiAction.ShareLocation(isChecked, location.longitude, location.latitude))
+                        }else{
+                            Toast.makeText(
+                                this,
+                                "Location is not found. Try Again",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            binding.switchToShare.isChecked = false
+                        }
+                    }
+                } else {
+                    launchPermissionLocation()
+                    binding.switchToShare.isChecked = false
+                }
+            }else{
+                uiAction(AddStoryUiAction.ShareLocation(isChecked))
+            }
+        }
+        
+        binding.switchToShare.doAfterTextChanged {
+            uiAction(AddStoryUiAction.SetDescription(it.toString()))
         }
     }
 
@@ -184,14 +225,17 @@ class AddStoryActivity : BaseActivity() {
                         binding.btnGalerry.isClickable = false
                         binding.btnCamera.isClickable = false
                         binding.btnUpload.isClickable = false
-                        binding.edDescription.isEnabled = false
-                        binding.edDescription.isFocusableInTouchMode = false
+                        binding.edDescription.apply {
+                            isEnabled = false
+                            isFocusableInTouchMode = false
+                        }
                         val successSnackBar = Snackbar.make(
                             binding.root,
                             it.message ?: getString(R.string.successfully_uploaded_story),
                             Snackbar.LENGTH_INDEFINITE
                         )
-                        successSnackBar.setAction(R.string.see_stories) {
+                        lifecycleScope.launch {
+                            delay(3000)
                             uiAction(AddStoryUiAction.NavigateToStories)
                         }
                         successSnackBar.show()
@@ -271,14 +315,25 @@ class AddStoryActivity : BaseActivity() {
     ) {
         if (it.resultCode == CAMERA_X_RESULT) {
             val myFile = it.data?.getSerializableExtra(CameraActivity.PICTURE) as File
-            viewModel.processAction(AddStoryUiAction.SetFile(myFile))
-            val isBackCamera = it.data?.getBooleanExtra(IS_BACK_CAMERA, true) as Boolean
-            val result = rotateBitmap(
-                BitmapFactory.decodeFile(myFile.path),
-                isBackCamera
-            )
-
-            binding.ivImage.setImageBitmap(result)
+            val reducedFile = reduceFileImage(myFile)
+            if(reducedFile.length() > MAX_IMAGE_SIZE){
+                val mySnackBar = Snackbar.make(binding.root,
+                    getString(R.string.exceed_max_size),
+                    Snackbar.LENGTH_LONG
+                ).setAction(R.string.try_again){
+                    viewModel.processAction(AddStoryUiAction.OpenCamera)
+                }
+                mySnackBar.show()
+            }else{
+                viewModel.processAction(AddStoryUiAction.SetFile(reducedFile))
+                val isBackCamera = it.data?.getBooleanExtra(IS_BACK_CAMERA, true) as Boolean
+                val result = rotateBitmap(
+                    BitmapFactory.decodeFile(reducedFile.path),
+                    isBackCamera
+                )
+                binding.ivImage.setImageBitmap(result)
+            }
+            
         }
     }
 
@@ -288,8 +343,18 @@ class AddStoryActivity : BaseActivity() {
         if (result.resultCode == RESULT_OK) {
             val selectedImg: Uri = result.data?.data as Uri
             val myFile = uriToFile(selectedImg, this@AddStoryActivity)
-            viewModel.processAction(AddStoryUiAction.SetFile(myFile))
-            binding.ivImage.setImageURI(selectedImg)
+            if(myFile.length() > MAX_IMAGE_SIZE){
+                val mySnackBar = Snackbar.make(binding.root,
+                    getString(R.string.exceed_max_size),
+                    Snackbar.LENGTH_LONG
+                ).setAction(R.string.try_again){
+                    viewModel.processAction(AddStoryUiAction.OpenGallery)
+                }
+                mySnackBar.show()
+            }else{
+                viewModel.processAction(AddStoryUiAction.SetFile(myFile))
+                binding.ivImage.setImageURI(selectedImg)   
+            }
         }
     }
 
@@ -297,5 +362,6 @@ class AddStoryActivity : BaseActivity() {
         const val CAMERA_X_RESULT = 200
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
         private const val REQUEST_CODE_PERMISSIONS = 10
+        private const val MAX_IMAGE_SIZE = 1048576
     }
 }

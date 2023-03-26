@@ -5,8 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import dev.haqim.storyapp.model.User
-import kotlinx.coroutines.flow.Flow
+import dev.haqim.storyapp.domain.model.User
 import kotlinx.coroutines.flow.map
 
 
@@ -22,6 +21,10 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
             token = preferences[TOKEN_KEY] ?: ""
         )
     }
+
+    fun getUserToken() = dataStore.data.map { preferences ->
+        preferences[TOKEN_KEY] ?: ""
+    }
     
     suspend fun saveUser(user: User) {
         dataStore.edit { preferences ->
@@ -30,12 +33,6 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
             preferences[EMAIL_KEY] = user.email
             preferences[LOGIN_STATUS] = user.hasLogin
             preferences[TOKEN_KEY] = user.token
-        }
-    }
-
-    suspend fun setLanguage(code: String) {
-        dataStore.edit { preferences ->
-            preferences[LANGUAGE_KEY] = code
         }
     }
 

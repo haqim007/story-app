@@ -31,6 +31,7 @@ class CustomPasswordEditText: TextInputLayout{
     }
 
     private fun initTextInputEditText(attrs: AttributeSet?) {
+
         textInputEditText = TextInputEditText(context, attrs)
 
         textInputEditText.setEms(10)
@@ -38,9 +39,9 @@ class CustomPasswordEditText: TextInputLayout{
             LayoutParams.MATCH_PARENT,
             LayoutParams.WRAP_CONTENT
         )
-        textInputEditText.inputType =
-            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-        textInputEditText.setTextAppearance(R.style.TextInputEditAppearance)
+        
+        textInputEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD 
+//        textInputEditText.setTextAppearance(R.style.TextInputEditAppearance)
 
         addView(textInputEditText)
     }
@@ -67,23 +68,6 @@ class CustomPasswordEditText: TextInputLayout{
 
         setErrorMessage()
         return true
-    }
-
-    fun isValid(): Boolean{
-
-        if(this.textInputEditText.text != null && this.textInputEditText.text!!.isBlank()){
-            return false
-        }
-
-        if(this.textInputEditText.text != null && this.textInputEditText.text!!.length < 8){
-            return false
-        }
-
-        return true
-    }
-
-    fun setText(text: String?){
-        textInputEditText.setText(text)
     }
 
     fun setErrorMessage(message: String? = null){

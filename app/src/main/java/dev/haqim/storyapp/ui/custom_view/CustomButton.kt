@@ -34,9 +34,9 @@ class CustomButton: FrameLayout {
     private fun init(){
         inflate(context, R.layout.custom_button, this)
 
-        tvText = findViewById(R.id.tvText)
-        loading = findViewById(R.id.loading)
-        cl = findViewById(R.id.cl)
+        tvText = findViewById(R.id.tvCustomButton)
+        loading = findViewById(R.id.loadingCustomButton)
+        cl = findViewById(R.id.clCustomButton)
     }
     fun setText(text: String) {
         tvText.text = text

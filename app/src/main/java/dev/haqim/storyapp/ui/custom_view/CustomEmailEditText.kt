@@ -38,7 +38,7 @@ class CustomEmailEditText: TextInputLayout{
         )
         textInputEditText.inputType =
             InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS or InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS
-        textInputEditText.setTextAppearance(R.style.TextInputEditAppearance)
+//        textInputEditText.setTextAppearance(R.style.TextInputEditAppearance)
         addView(textInputEditText)
     }
 
@@ -68,10 +68,6 @@ class CustomEmailEditText: TextInputLayout{
 
     fun isEmailValid(email: String): Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
-
-    fun setText(text: String?){
-        textInputEditText.setText(text)
     }
 
     fun setErrorMessage(message: String? = null){

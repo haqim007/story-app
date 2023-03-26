@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Environment
+import android.webkit.MimeTypeMap
 import dev.haqim.storyapp.R
 import java.io.*
 import java.text.SimpleDateFormat
@@ -22,7 +23,7 @@ val timeStamp: String = SimpleDateFormat(
 ).format(System.currentTimeMillis())
 
 
-fun createFile(application: Application): File {
+fun createFile(application: Application, mimeType: String = "jpg"): File {
     val mediaDir = application.externalMediaDirs.firstOrNull()?.let {
         File(it, application.resources.getString(R.string.app_name)).apply { mkdirs() }
     }
@@ -31,18 +32,20 @@ fun createFile(application: Application): File {
         mediaDir != null && mediaDir.exists()
     ) mediaDir else application.filesDir
 
-    return File(outputDirectory, "$timeStamp.jpg")
+    return File(outputDirectory, "$timeStamp.$mimeType")
 }
 
 // Untuk kasus Intent Camera
-fun createCustomTempFile(context: Context): File {
+fun createCustomTempFile(context: Context, mimeType: String = "jpg"): File {
     val storageDir: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-    return File.createTempFile(timeStamp, ".jpg", storageDir)
+    return File.createTempFile(timeStamp, ".$mimeType", storageDir)
 }
 
 fun uriToFile(selectedImg: Uri, context: Context): File {
     val contentResolver: ContentResolver = context.contentResolver
-    val myFile = createCustomTempFile(context)
+    val mime = MimeTypeMap.getSingleton()
+    val type = mime.getExtensionFromMimeType(contentResolver.getType(selectedImg))
+    val myFile = createCustomTempFile(context, type ?: "jpg")
 
     val inputStream = contentResolver.openInputStream(selectedImg) as InputStream
     val outputStream: OutputStream = FileOutputStream(myFile)
@@ -84,4 +87,19 @@ fun rotateBitmap(bitmap: Bitmap, isBackCamera: Boolean = false): Bitmap {
             true
         )
     }
+}
+
+fun reduceFileImage(file: File): File {
+    val bitmap = BitmapFactory.decodeFile(file.path)
+    var compressQuality = 100
+    var streamLength: Int
+    do {
+        val bmpStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, compressQuality, bmpStream)
+        val bmpPicByteArray = bmpStream.toByteArray()
+        streamLength = bmpPicByteArray.size
+        compressQuality -= 5
+    } while (streamLength > 1000000)
+    bitmap.compress(Bitmap.CompressFormat.JPEG, compressQuality, FileOutputStream(file))
+    return file
 }

@@ -1,0 +1,9 @@
+{
+  "error": false,
+  "message": "success",
+  "loginResult": {
+    "userId": "user-G-VTeSq4oNPfyQff",
+    "name": "haqim",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLUctVlRlU3E0b05QZnlRZmYiLCJpYXQiOjE2Nzc1NDI0Njh9.Ix1VQn6IFOpGQ8bRb70NiaCMuo9KvrENXR1CDt_tJ14"
+  }
+}

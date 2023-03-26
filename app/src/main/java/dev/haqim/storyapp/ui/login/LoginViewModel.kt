@@ -3,14 +3,15 @@ package dev.haqim.storyapp.ui.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.haqim.storyapp.data.mechanism.Resource
-import dev.haqim.storyapp.data.repository.StoryRepository
-import dev.haqim.storyapp.model.Login
-import dev.haqim.storyapp.ui.mechanism.*
+import dev.haqim.storyapp.domain.model.Login
+import dev.haqim.storyapp.domain.usecase.StoryUseCase
+import dev.haqim.storyapp.helper.util.InputValidation
+import dev.haqim.storyapp.helper.util.ResultInput
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 
 class LoginViewModel(
-    private val repository: StoryRepository
+    private val storyUseCase: StoryUseCase
 ): ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState = _uiState.stateIn(
@@ -24,7 +25,10 @@ class LoginViewModel(
         actionStateFlow.updateStates().launchIn(viewModelScope)
     }
 
-    fun processAction(action: LoginUiAction) = actionStateFlow.tryEmit(action)
+    fun processAction(action: LoginUiAction): Boolean {
+//        EspressoIdlingResource.increment()
+        return actionStateFlow.tryEmit(action)
+    }
 
     private fun MutableSharedFlow<LoginUiAction>.updateStates() = onEach {
         when(it){
@@ -54,7 +58,7 @@ class LoginViewModel(
             }
             is LoginUiAction.Submit -> {
                 if(uiState.value.allInputValid){
-                    repository.login(
+                    storyUseCase.login(
                         email = uiState.value.email.data!!,
                         password = uiState.value.password.data!!
                     ).collect{
@@ -69,6 +73,7 @@ class LoginViewModel(
             }
             is LoginUiAction.NavigateToRegistration -> {
                 _uiState.update { state -> state.copy(navigateToRegistration = !state.navigateToRegistration) }
+//                EspressoIdlingResource.decrement()
             }
         }
     }

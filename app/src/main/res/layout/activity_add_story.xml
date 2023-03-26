@@ -75,16 +75,39 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <LinearLayout
+        android:id="@+id/switchLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="@+id/til_description"
+        app:layout_constraintTop_toBottomOf="@+id/til_description">
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switchToShare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@+id/til_description"
+            app:layout_constraintTop_toBottomOf="@+id/til_description" />
+
+        <TextView
+            android:layout_marginStart="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/share_location" />
+
+    </LinearLayout>
+
     <dev.haqim.storyapp.ui.custom_view.CustomButton
-        android:layout_marginTop="16dp"
         android:id="@+id/btn_upload"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:contentDescription="@string/upload"
         android:text="@string/upload"
         android:textAllCaps="false"
         app:layout_constraintEnd_toEndOf="@+id/til_description"
         app:layout_constraintStart_toStartOf="@+id/til_description"
-        app:layout_constraintTop_toBottomOf="@+id/til_description" />
+        app:layout_constraintTop_toBottomOf="@+id/switchLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

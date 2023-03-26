@@ -1,0 +1,276 @@
+{
+    "error": false,
+    "message": "Stories fetched successfully",
+    "listStory": [
+        {
+            "id": "story-xXQ_QqoTxTGq6ima",
+            "name": "punten",
+            "description": "test",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677661649566_Dl67p-s4.jpg",
+            "createdAt": "2023-03-01T09:07:29.568Z",
+            "lat": 37.421998333333335,
+            "lon": -122.084
+        },
+        {
+            "id": "story-vnfn3YeeBDRpo7lB",
+            "name": "ada",
+            "description": "tester",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677659200571_byyVo9SW.jpg",
+            "createdAt": "2023-03-01T08:26:40.572Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-7q8UUr--8bxvhuA7",
+            "name": "ada",
+            "description": "ftthju",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677659153563_2WQDS7V6.jpg",
+            "createdAt": "2023-03-01T08:25:53.565Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-jJOuL6basseHJ3wP",
+            "name": "ada",
+            "description": "vgff",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677657819597_7gVA80TE.jpg",
+            "createdAt": "2023-03-01T08:03:39.602Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-ncHMXSerPBDg6VMw",
+            "name": "ada",
+            "description": "xx",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677657747525_9SxBDYS3.jpg",
+            "createdAt": "2023-03-01T08:02:27.526Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-OPpTjYRtX3UVYWrU",
+            "name": "ada",
+            "description": "tt",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677657617165_Lq-pF_Lm.png",
+            "createdAt": "2023-03-01T08:00:17.166Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-VzEZgHTxNbqasVaa",
+            "name": "ada",
+            "description": "xc",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677657356037_h83uWk0s.jpg",
+            "createdAt": "2023-03-01T07:55:56.039Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-uXgOHCgDfu1PNyVV",
+            "name": "ada",
+            "description": "cc",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677656042575_Izb1bxx5.jpg",
+            "createdAt": "2023-03-01T07:34:02.576Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-A5EdymHEvjG02StN",
+            "name": "ada",
+            "description": "tes lagi",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677655634118_PKOVqHFl.jpg",
+            "createdAt": "2023-03-01T07:27:14.119Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-PRBZXHmDv82Ett6p",
+            "name": "ada",
+            "description": "tes tes",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677655612930_qoU01LK-.jpg",
+            "createdAt": "2023-03-01T07:26:52.931Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-ZUnjmcLUcT-PSsNt",
+            "name": "ada",
+            "description": "tes",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677655259097_ntA0zdgF.jpg",
+            "createdAt": "2023-03-01T07:20:59.097Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-hAhYNerM25Zsu0mu",
+            "name": "reviewer",
+            "description": "test",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677640655567_XV6LwEcG.png",
+            "createdAt": "2023-03-01T03:17:35.568Z",
+            "lat": -7.289748,
+            "lon": 110.430275
+        },
+        {
+            "id": "story-GRRYBg0blXnjBQKN",
+            "name": "reviewer",
+            "description": "cam",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677640636085_2dUsFTex.jpg",
+            "createdAt": "2023-03-01T03:17:16.086Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-PfUVeGkzCWlDxkPz",
+            "name": "malih",
+            "description": "sip",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677635244840_g0Saafff.jpg",
+            "createdAt": "2023-03-01T01:47:24.842Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-N1Tys7HKrWL0rUxy",
+            "name": "haqim",
+            "description": "okayy",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677635145738_CXs4J7VH.jpg",
+            "createdAt": "2023-03-01T01:45:45.741Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-YiOD470emSgVeShM",
+            "name": "haqim",
+            "description": "manteppp euy",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677635003263_ft7oFchc.jpg",
+            "createdAt": "2023-03-01T01:43:23.268Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-AemDMcokRtBX67lr",
+            "name": "fajar",
+            "description": "\"tes\"",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677605951431_a2Xd9VqW.jpg",
+            "createdAt": "2023-02-28T17:39:11.437Z",
+            "lat": -0.9386245,
+            "lon": 100.4597
+        },
+        {
+            "id": "story-Zq_3Wt5fE2h2cczc",
+            "name": "apel89",
+            "description": "test2",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677598125251_hCaAiFo5.jpg",
+            "createdAt": "2023-02-28T15:28:45.252Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-HGrgqOY7QJRGIXed",
+            "name": "apel89",
+            "description": "test2",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677597942824_1fWVrpfx.jpg",
+            "createdAt": "2023-02-28T15:25:42.826Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-B4pAck6cQs_dOzsk",
+            "name": "apel89",
+            "description": "test",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1677597772791_IPnHgtRa.jpg",
+            "createdAt": "2023-02-28T15:22:52.792Z",
+            "lat": null,
+            "lon": null
+        },
+        {
+            "id": "story-h88og1LDkqfb7bb2",
+            "name": "Dicoding",
+            "description": "Tak ada yang tak mungkin jika berusaha",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1648721132156_MX2C9FYA.jpg",
+            "createdAt": "2022-03-31T10:05:32.157Z",
+            "lat": -6.4517064,
+            "lon": 107.9145669
+        },
+        {
+            "id": "story-MNZlDhSUrebE_xy4",
+            "name": "Dicoding",
+            "description": "Upgrade Diri saat Pandemi, Perlu!",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1648721059572_iyQwKOO-.jpg",
+            "createdAt": "2022-03-31T10:04:19.574Z",
+            "lat": -2.9549663,
+            "lon": 104.6929236
+        },
+        {
+            "id": "story-LsJW4nIdEm5166pp",
+            "name": "Dicoding",
+            "description": "Kalau saja saya tidak mencantumkan sertifikat kompetensi dari Dicoding, mungkin hasilnya zonk. Habisnya, pengalaman kerja 5 tahun lalu gak relevan sama sekali dengan Web Developer.",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1648721013029_xPquDWah.jpg",
+            "createdAt": "2022-03-31T10:03:33.032Z",
+            "lat": -6.8934518,
+            "lon": 112.0253573
+        },
+        {
+            "id": "story-t1br2m3Tg8QHSG5v",
+            "name": "Dicoding",
+            "description": "Berkat Kekurangan, Tak Jadi Halangan",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1648720936351_XAaAyT6U.jpg",
+            "createdAt": "2022-03-31T10:02:16.352Z",
+            "lat": -6.545286,
+            "lon": 106.5338975
+        },
+        {
+            "id": "story-RRXghhvQZla2wUTU",
+            "name": "Dicoding",
+            "description": "Pendidikan formal dan ijazah saja tidak cukup untuk self growth",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1648720873748_H78HnWtO.jpg",
+            "createdAt": "2022-03-31T10:01:13.750Z",
+            "lat": -7.9786395,
+            "lon": 112.5617421
+        },
+        {
+            "id": "story-ZBk-FmRMTBV71Hhf",
+            "name": "Dicoding",
+            "description": "Jadi Developer Harus Berani Keluar Zona Nyaman",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1648720795526_877kLrZI.jpg",
+            "createdAt": "2022-03-31T09:59:55.530Z",
+            "lat": -7.9786395,
+            "lon": 112.5617421
+        },
+        {
+            "id": "story-Yk89TWuHxSYsE-1u",
+            "name": "Dicoding",
+            "description": "Because for me, in this tough times, Bangkit represents hope. Only in Bangkit..a person like me..can study with the best curriculum and best experts. Thanks to Bangkit, now I aspire to be a machine learning specialist!",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1648720737599_XbEPxqHS.jpg",
+            "createdAt": "2022-03-31T09:58:57.600Z",
+            "lat": -7.4730525,
+            "lon": 110.1825048
+        },
+        {
+            "id": "story-daqkGOdCARqApatM",
+            "name": "Dicoding",
+            "description": "Jika sudah berusaha maksimal, saatnya berserah diri. Dengan sikap ikhlas ini, meski gagal sekalipun, tidak jadi soal. Pasti itu hal terbaik yang dipercayakan pada kita untuk saat ini.",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1648720672402_JwvDCowd.jpg",
+            "createdAt": "2022-03-31T09:57:52.403Z",
+            "lat": -7.9786395,
+            "lon": 112.5617421
+        },
+        {
+            "id": "story-QkK0bSX6pdCS6GU7",
+            "name": "Dicoding",
+            "description": "Agar sukses (meniti karir), “belajar jangan hanya di kampus saja!",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1648720583566_jD27n82O.png",
+            "createdAt": "2022-03-31T09:56:23.567Z",
+            "lat": -6.9733165,
+            "lon": 107.6281415
+        },
+        {
+            "id": "story-FPkiCfHWfRpjwiY0",
+            "name": "Dicoding",
+            "description": "Jika sudah cinta programming, maka belajar ngoding pun terasa lebih mudah dan enjoy",
+            "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1648719567500_ssbAAkGs.png",
+            "createdAt": "2022-03-31T09:39:27.502Z",
+            "lat": -6.0019502,
+            "lon": 106.0662807
+        }
+    ]
+}
