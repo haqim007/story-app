@@ -25,27 +25,38 @@ jobs:
       # Checkout the code as the first step.
       - checkout
       
+      # Restore cached dependencies
       - restore_cache:
           key: android-orb-v1-
 
+      # Get access to use gradle
       - run:
           name: Chmods permission
           command: sudo chmod +x ./gradlew
-
+          
+      # Create file local.properties
+      - run:
+          name: Create local.properties
+          command: touch local.properties
+      
+      # Download dependencies
       - run:
           name: Download Dependencies
           command: ./gradlew androidDependencies
-
+          
+      # Cache downloaded dependencies
       - save_cache:
           paths:
             - ~/.android/build-cache
             - ~/.android/cache
           key: "android-orb-v1-{{ epoch }}"
-
+      
+      # Run build
       - run:
           name: Run Build
           command: ./gradlew build
 
+      # Take reports from app/build/reports to reports folder
       - store_artifacts: 
           path: app/build/reports
           destination: reports
@@ -59,7 +70,8 @@ jobs:
       - android/start-emulator-and-run-tests:
           test-command: ./gradlew connectedDebugAndroidTest
           system-image: system-images;android-25;google_apis;x86
-
+          
+      # Store test results
       - store_test_results:
           path: app/build/test-results
 
@@ -68,10 +80,15 @@ jobs:
           name: Assemble release build
           command: |
             ./gradlew assembleRelease
-
+      
+      # Copy apk from app/build/outputs/apk/debug/  and paste it to artifact-file
       - store_artifacts:  
           path: app/build/outputs/apk/debug/
           destination: artifact-file
+      # Delete local.properties
+      - run:
+          name: Delete local.properties
+          command: rm local.properties
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
