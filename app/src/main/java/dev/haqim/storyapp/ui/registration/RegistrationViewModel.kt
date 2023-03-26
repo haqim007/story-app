@@ -3,14 +3,16 @@ package dev.haqim.storyapp.ui.registration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.haqim.storyapp.data.mechanism.Resource
-import dev.haqim.storyapp.data.repository.StoryRepository
-import dev.haqim.storyapp.model.BasicMessage
-import dev.haqim.storyapp.ui.mechanism.*
+import dev.haqim.storyapp.domain.model.BasicMessage
+import dev.haqim.storyapp.domain.usecase.StoryUseCase
+import dev.haqim.storyapp.helper.util.InputValidation
+import dev.haqim.storyapp.helper.util.ResultInput
+import dev.haqim.storyapp.helper.util.isValidRequiredField
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 
 class RegistrationViewModel(
-    private val repository: StoryRepository
+    private val storyUseCase: StoryUseCase
 ): ViewModel() {
     private val _uiState = MutableStateFlow(RegistrationUiState())
     val uiState = _uiState.stateIn(
@@ -64,7 +66,7 @@ class RegistrationViewModel(
             }
             is RegistrationUiAction.Submit -> {
                 if(uiState.value.allInputValid){
-                    repository.register(
+                    storyUseCase.register(
                         name = uiState.value.name.data!!,
                         email = uiState.value.email.data!!,
                         password = uiState.value.password.data!!

@@ -34,7 +34,7 @@ class LoginActivity : BaseActivity() {
         val uiAction = {action: LoginUiAction -> viewModel.processAction(action)}
 
         //bindInputEmail
-        bindInputEmail(uiState, uiAction)
+        bindInputEmail(uiAction)
 
         // bindPasswordInput
         bindInputPassword(uiState, uiAction)
@@ -83,7 +83,7 @@ class LoginActivity : BaseActivity() {
                     }
                     is Resource.Error -> {
                         val mySnackBar = Snackbar.make(
-                            binding.coordinator,
+                            binding.root,
                             it.message ?: getString(R.string.failed_to_login),
                             Snackbar.LENGTH_INDEFINITE
                         )
@@ -138,32 +138,8 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun bindInputEmail(
-        uiState: StateFlow<LoginUiState>,
         uiAction: (LoginUiAction) -> Boolean,
     ) {
-//        val emailInputFlow = uiState.map { it.email }.distinctUntilChanged()
-//        lifecycleScope.launch {
-//            emailInputFlow.collectLatest {
-//                if (it is ResultInput.Invalid) {
-//                    binding.edLoginEmailLayout.isErrorEnabled = true
-//                    when (it.validation) {
-//                        InputValidation.EmailInvalid -> {
-//                            binding.edLoginEmailLayout.error =
-//                                getString(R.string.email_format_is_invalid)
-//                        }
-//                        InputValidation.RequiredFieldInvalid -> {
-//                            binding.edLoginEmailLayout.error =
-//                                getString(R.string.email_is_required)
-//                        }
-//                        else -> {}
-//                    }
-//                } else {
-//                    binding.edLoginEmailLayout.error = null
-//                    binding.edLoginEmailLayout.isErrorEnabled = false
-//                }
-//            }
-//        }
-
         binding.edLoginEmail.doAfterTextChanged { value, isValid ->
             uiAction(LoginUiAction.SetEmail(value.toString(), isValid))
         }

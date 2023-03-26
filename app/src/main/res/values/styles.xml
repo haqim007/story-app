@@ -6,10 +6,11 @@
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="TextInputEditAppearance" parent="">
+    <style name="TextInputEditAppearance" parent="TextAppearance.AppCompat.Body2">
         <item name="android:fontFamily">Roboto-Medium</item>
         <item name="fontFamily">Roboto-Medium</item>
         <item name="android:textSize">15sp</item>
         <item name="android:textAppearance">?attr/textAppearanceBodyLarge</item>
     </style>
+
 </resources>

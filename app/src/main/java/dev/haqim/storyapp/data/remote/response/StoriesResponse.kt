@@ -2,14 +2,15 @@ package dev.haqim.storyapp.data.remote.response
 
 import android.icu.text.SimpleDateFormat
 import com.google.gson.annotations.SerializedName
+import dev.haqim.storyapp.data.local.entity.StoryEntity
+import dev.haqim.storyapp.domain.model.Story
 import dev.haqim.storyapp.helper.util.TimeAgo
-import dev.haqim.storyapp.model.Story
 import java.util.*
 
 data class StoriesResponse(
 
 	@field:SerializedName("listStory")
-	val listStory: List<StoryResponse>? = null,
+	val listStory: List<StoryResponse>,
 
 	@field:SerializedName("error")
 	val error: Boolean,
@@ -43,7 +44,7 @@ data class StoryResponse(
 )
 
 fun StoriesResponse.toModel(): List<Story>?{
-	return this.listStory?.map {
+	return this.listStory.map {
 		val createdAtDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(
 			it.createdAt
 		)
@@ -57,5 +58,16 @@ fun StoriesResponse.toModel(): List<Story>?{
 			lat = it.lat
 		)
 	}
+}
+
+fun StoryResponse.toEntity() =
+	StoryEntity(
+		id, photoUrl, createdAt, name, description, lon, lat
+	)
+
+fun List<StoryResponse>?.toEntity(): List<StoryEntity> {
+	return this?.map {
+		it.toEntity()
+	} ?: listOf()
 }
 

@@ -1,13 +1,29 @@
 package dev.haqim.storyapp.helper.util
 
-class TimeAgo {
+import java.text.SimpleDateFormat
+import java.util.*
+
+class TimeAgo (private val now: Long = System.currentTimeMillis()) {
+    
+    fun getTimeAgo(datetime: String): String? {
+        return try {
+            val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                .parse(
+                    datetime
+                )
+
+            date?.let{ getTimeAgo(date.time) }
+        }catch (e: Exception){
+            null
+        }
+    }
 
     fun getTimeAgo(_time: Long): String? {
         var time = _time
         if (time < 1000000000000L) {
             time *= 1000
         }
-        val now = System.currentTimeMillis()
+        
         if (time > now || time <= 0) {
             return null
         }

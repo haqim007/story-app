@@ -3,17 +3,17 @@ package dev.haqim.storyapp.ui.add_story
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.haqim.storyapp.data.mechanism.Resource
-import dev.haqim.storyapp.data.repository.StoryRepository
-import dev.haqim.storyapp.model.BasicMessage
-import dev.haqim.storyapp.model.User
-import dev.haqim.storyapp.ui.mechanism.ResultInput
-import dev.haqim.storyapp.ui.mechanism.isValidRequiredField
+import dev.haqim.storyapp.domain.model.BasicMessage
+import dev.haqim.storyapp.domain.model.User
+import dev.haqim.storyapp.domain.usecase.StoryUseCase
+import dev.haqim.storyapp.helper.util.ResultInput
+import dev.haqim.storyapp.helper.util.isValidRequiredField
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.File
 
-class AddStoryViewModel(private val repository: StoryRepository) : ViewModel() {
+class AddStoryViewModel(private val storyUseCase: StoryUseCase) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddStoryUiState())
     val uiState = _uiState.stateIn(
@@ -34,7 +34,7 @@ class AddStoryViewModel(private val repository: StoryRepository) : ViewModel() {
         when(it){
             is AddStoryUiAction.GetUserData -> {
                 viewModelScope.launch {
-                    repository.getUser().collectLatest {user ->
+                    storyUseCase.getUser().collectLatest {user ->
                         _uiState.update { state ->
                             state.copy(userData = user)
                         }
@@ -63,10 +63,11 @@ class AddStoryViewModel(private val repository: StoryRepository) : ViewModel() {
             }
             is AddStoryUiAction.UploadStory -> {
                 viewModelScope.launch {
-                    repository.addStory(
-                        token = uiState.value.userData?.token ?: "",
+                    storyUseCase.addStory(
                         file = uiState.value.file!!,
-                        description = uiState.value.description.data!!
+                        description = uiState.value.description.data!!,
+                        lon = uiState.value.lon?.toFloat(),
+                        lat = uiState.value.lat?.toFloat()
                     ).collect {
                         _uiState.update { state ->
                             state.copy(uploadResult = it)
@@ -98,6 +99,15 @@ class AddStoryViewModel(private val repository: StoryRepository) : ViewModel() {
                     )
                 }
             }
+            is AddStoryUiAction.ShareLocation -> {
+                _uiState.update { state -> 
+                    state.copy(
+                        lon = it.lon,
+                        lat = it.lat,
+                        shareLocation = it.shareLocation
+                    )
+                }
+            }
         }
     }
     
@@ -111,7 +121,10 @@ data class AddStoryUiState(
     val description: ResultInput<String> = ResultInput.Idle(),
     val uploadResult: Resource<BasicMessage> = Resource.Idle(),
     val allInputValid: Boolean = false,
-    val navigateToStories: Boolean = false
+    val navigateToStories: Boolean = false,
+    val shareLocation: Boolean = false,
+    val lon: Double? = null,
+    val lat: Double? = null
 )
 
 sealed class AddStoryUiAction{
@@ -124,5 +137,6 @@ sealed class AddStoryUiAction{
     data class SetFile(val file: File): AddStoryUiAction()
     data class SetDescription(val description: String): AddStoryUiAction()
     object NavigateToStories : AddStoryUiAction()
+    data class ShareLocation(val shareLocation: Boolean, val lon: Double? = null, val lat: Double? = null): AddStoryUiAction()
 }
 

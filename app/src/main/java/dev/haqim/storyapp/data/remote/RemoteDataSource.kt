@@ -1,20 +1,24 @@
 package dev.haqim.storyapp.data.remote
 
 import com.google.gson.Gson
+import dev.haqim.storyapp.data.preferences.UserPreference
 import dev.haqim.storyapp.data.remote.network.ApiService
 import dev.haqim.storyapp.data.remote.response.BasicResponse
 import dev.haqim.storyapp.data.remote.response.LoginResponse
 import dev.haqim.storyapp.data.remote.response.StoriesResponse
-import dev.haqim.storyapp.data.remote.response.StoryResponse
-import dev.haqim.storyapp.model.Story
+import dev.haqim.storyapp.helper.util.RequestBodyUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import retrofit2.HttpException
+import java.io.File
 
-class RemoteDataSource(private val service: ApiService) {
+class RemoteDataSource(
+    private val service: ApiService,
+    private val userPreference: UserPreference,
+    private val requestBodyUtil: RequestBodyUtil = RequestBodyUtil
+) {
     
     fun register(
         name: String, email: String, password: String
@@ -50,8 +54,9 @@ class RemoteDataSource(private val service: ApiService) {
         }
     }
 
-    fun getStories(page: Int, size: Int, location: Boolean, token: String): Flow<Result<StoriesResponse>> {
+    fun getStories(page: Int, size: Int, location: Int = 0) : Flow<Result<StoriesResponse>> {
         return flow {
+            val token = userPreference.getUserToken().first()
             val response = service.getAllStories(page, size, location, token)
             emit(Result.success(response))
         }.catch {
@@ -65,14 +70,26 @@ class RemoteDataSource(private val service: ApiService) {
     }
 
     fun addStory(
-        token: String,
-        file: MultipartBody.Part,
-        description: RequestBody,
-        lon: RequestBody? = null,
-        lat: RequestBody? = null
+        file: File,
+        description: String,
+        lon: Float? = null,
+        lat: Float? = null
     ): Flow<Result<BasicResponse>> {
+
+        val multipartFile = requestBodyUtil.multipartRequestBody(file)
+        val descriptionRequestBody = requestBodyUtil.textPlainRequestBody(description)
+        val lonRequestBody = requestBodyUtil.textPlainRequestBodyNullable(lon?.toString())
+        val latRequestBody = requestBodyUtil.textPlainRequestBodyNullable(lat?.toString())
+        
         return flow {
-            val response = service.addNewStory(file, description, lon, lat, token)
+            val token = userPreference.getUserToken().first()
+            val response = service.addNewStory(
+                file = multipartFile,
+                description = descriptionRequestBody, 
+                lon = lonRequestBody, 
+                lat = latRequestBody, 
+                token =  token
+            )
             emit(Result.success(response))
         }.catch {
             val error = (it as? HttpException)?.response()?.errorBody()?.string()

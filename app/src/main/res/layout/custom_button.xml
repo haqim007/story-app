@@ -8,7 +8,7 @@
     app:cardElevation="8dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl"
+        android:id="@+id/clCustomButton"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/color_primary"
@@ -16,7 +16,7 @@
         >
 
         <TextView
-            android:id="@+id/tvText"
+            android:id="@+id/tvCustomButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
@@ -29,7 +29,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ProgressBar
-            android:id="@+id/loading"
+            android:id="@+id/loadingCustomButton"
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:indeterminate="true"

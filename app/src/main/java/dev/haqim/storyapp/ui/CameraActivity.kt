@@ -6,10 +6,7 @@ import android.os.Bundle
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import dev.haqim.storyapp.R
@@ -38,6 +35,14 @@ class CameraActivity : BaseActivity() {
     }
     
     private fun takePhoto() {
+        Toast.makeText(
+            this@CameraActivity,
+            getString(R.string.please_wait),
+            Toast.LENGTH_LONG
+        ).show()
+        binding.captureImage.isClickable = false
+        binding.switchCamera.isClickable = false
+        
         val imageCapture = imageCapture ?: return
         val photoFile = createFile(application)
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
@@ -51,6 +56,8 @@ class CameraActivity : BaseActivity() {
                         getString(R.string.failed_to_take_a_picture),
                         Toast.LENGTH_SHORT
                     ).show()
+                    binding.captureImage.isClickable = true
+                    binding.switchCamera.isClickable = true
                 }
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     Toast.makeText(
@@ -58,7 +65,9 @@ class CameraActivity : BaseActivity() {
                         getString(R.string.success_taking_picture),
                         Toast.LENGTH_SHORT
                     ).show()
-    
+                    binding.captureImage.isClickable = true
+                    binding.switchCamera.isClickable = true
+
                     val intent = Intent()
                     intent.putExtra(PICTURE, photoFile)
                     intent.putExtra(
@@ -68,7 +77,7 @@ class CameraActivity : BaseActivity() {
                     setResult(AddStoryActivity.CAMERA_X_RESULT, intent)
                     finish()
                 }
-                
+
             }
         )
     }
@@ -88,7 +97,10 @@ class CameraActivity : BaseActivity() {
                     it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
                 }
             
-            imageCapture = ImageCapture.Builder().build()
+            imageCapture = ImageCapture
+                .Builder()
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                .build()
             
             try {
                 cameraProvider.unbindAll()

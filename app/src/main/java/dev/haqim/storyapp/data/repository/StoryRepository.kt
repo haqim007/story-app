@@ -1,55 +1,58 @@
 package dev.haqim.storyapp.data.repository
 
+import androidx.paging.*
+import dev.haqim.storyapp.data.local.LocalDataSource
+import dev.haqim.storyapp.data.local.entity.toModel
 import dev.haqim.storyapp.data.mechanism.NetworkBoundResource
 import dev.haqim.storyapp.data.mechanism.Resource
 import dev.haqim.storyapp.data.preferences.UserPreference
 import dev.haqim.storyapp.data.remote.RemoteDataSource
 import dev.haqim.storyapp.data.remote.response.*
-import dev.haqim.storyapp.model.BasicMessage
-import dev.haqim.storyapp.model.Login
-import dev.haqim.storyapp.model.Story
-import dev.haqim.storyapp.model.User
+import dev.haqim.storyapp.data.remoteMediator.StoryRemoteMediator
+import dev.haqim.storyapp.domain.model.BasicMessage
+import dev.haqim.storyapp.domain.model.Login
+import dev.haqim.storyapp.domain.model.Story
+import dev.haqim.storyapp.domain.model.User
+import dev.haqim.storyapp.domain.repository.IStoryRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
+import kotlinx.coroutines.flow.map
 import java.io.File
 
 class StoryRepository(
     private val remoteDataSource: RemoteDataSource,
-    private val userPreference: UserPreference
-) {
-    fun register(
+    private val userPreference: UserPreference,
+    private val localDataSource: LocalDataSource,
+    private val remoteMediator: StoryRemoteMediator
+): IStoryRepository {
+    override fun register(
         name: String, email: String, password: String
     ): Flow<Resource<BasicMessage>> {
         return object : NetworkBoundResource<BasicMessage, BasicResponse>(){
-            override fun createCall(): Flow<Result<BasicResponse>> {
+            override fun fetchFromRemote(): Flow<Result<BasicResponse>> {
                 return remoteDataSource.register( name, email, password)
             }
     
-            override fun loadFromNetwork(data: BasicResponse): Flow<BasicMessage> {
+            override fun loadResultData(data: BasicResponse): Flow<BasicMessage> {
                 return flowOf(data.toModel())
             }
     
-            override suspend fun saveCallResult(data: BasicResponse) {}
+            override suspend fun saveRemoteData(data: BasicResponse) {}
     
         }.asFlow()
     }
 
-    fun login(email: String, password: String): Flow<Resource<Login>> {
+    override fun login(email: String, password: String): Flow<Resource<Login>> {
         return object : NetworkBoundResource<Login, LoginResponse>(){
-            override fun createCall(): Flow<Result<LoginResponse>> {
+            override fun fetchFromRemote(): Flow<Result<LoginResponse>> {
                 return remoteDataSource.login(email, password)
             }
 
-            override fun loadFromNetwork(data: LoginResponse): Flow<Login> {
+            override fun loadResultData(data: LoginResponse): Flow<Login> {
                 return flowOf(data.toModel())
             }
 
-            override suspend fun saveCallResult(data: LoginResponse) {
+            override suspend fun saveRemoteData(data: LoginResponse) {
                 // save result to user preference
                 userPreference.saveUser(
                     data.toUser(
@@ -63,63 +66,73 @@ class StoryRepository(
         }.asFlow()
     }
 
-    fun getUser(): Flow<User> {
+    override fun getUser(): Flow<User> {
         return userPreference.getUser()
     }
 
-    fun getStories(page: Int, size: Int, location: Boolean, token: String): Flow<Resource<List<Story>?>> {
-        return object: NetworkBoundResource<List<Story>?, StoriesResponse>(){
+    override fun getStoriesWithLocation(pageSize: Int, page: Int): Flow<Resource<List<Story>>> {
+        return object: NetworkBoundResource<List<Story>, StoriesResponse>(){
 
-            override fun createCall(): Flow<Result<StoriesResponse>> {
-                return remoteDataSource.getStories(page, size, location, token)
+            override fun fetchFromRemote(): Flow<Result<StoriesResponse>> {
+                return remoteDataSource.getStories(page, pageSize, 1)
             }
 
-            override suspend fun saveCallResult(data: StoriesResponse) {}
+            override suspend fun saveRemoteData(data: StoriesResponse) {
+                val storyEntities = data.listStory.toEntity()
+                localDataSource.insertAllStories(storyEntities)
+            }
 
-            override fun loadFromNetwork(data: StoriesResponse): Flow<List<Story>?> {
-                return flowOf(data.toModel())
+            override fun loadResultData(data: StoriesResponse): Flow<List<Story>> {
+                return localDataSource.getAllStoriesWithLocation().map { it.toModel() }
             }
 
         }.asFlow()
     }
 
-    fun addStory(
-        token: String,
+    @OptIn(ExperimentalPagingApi::class)
+    override fun getStories(): Flow<PagingData<Story>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 30
+            ),
+            remoteMediator = remoteMediator,
+            pagingSourceFactory = {
+                localDataSource.getAllStories()
+            }
+        ).flow.map { pagingData ->
+            pagingData.map { storyEntity ->
+                storyEntity.toModel()
+            }
+        }
+    }
+
+    override fun addStory(
         file: File,
         description: String,
-        lon: Float? = null,
-        lat: Float? = null
+        lon: Float?,
+        lat: Float?
     ): Flow<Resource<BasicMessage>> {
         return object: NetworkBoundResource<BasicMessage, BasicResponse>(){
 
-            override fun createCall(): Flow<Result<BasicResponse>> {
-                val requestImageFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-                val multipartFile = MultipartBody.Part.createFormData(
-                    "photo",
-                    file.name,
-                    requestImageFile
-                )
-                val descriptionRequestBody =
-                    description.toRequestBody("text/plain".toMediaType())
+            override fun fetchFromRemote(): Flow<Result<BasicResponse>> {
                 return remoteDataSource.addStory(
-                    token = token,
-                    file = multipartFile,
-                    description = descriptionRequestBody,
-                    lon = lon?.toString()?.toRequestBody(),
-                    lat = lat?.toString()?.toRequestBody()
+                    file = file,
+                    description = description,
+                    lon = lon,
+                    lat = lat
                 )
             }
 
-            override suspend fun saveCallResult(data: BasicResponse) {}
+            override suspend fun saveRemoteData(data: BasicResponse) {}
 
-            override fun loadFromNetwork(data: BasicResponse): Flow<BasicMessage> {
+            override fun loadResultData(data: BasicResponse): Flow<BasicMessage> {
                 return flowOf(data.toModel())
             }
 
         }.asFlow()
     }
 
-    suspend fun logout(){
+    override suspend fun logout(){
         userPreference.logout()
     }
 }

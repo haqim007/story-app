@@ -45,4 +45,12 @@
     <string name="logout">Keluar</string>
     <string name="home">Beranda</string>
     <string name="type_email_here">Ketik email disini</string>
+    <string name="click_to_add_new_story">Klik untuk tambah story</string>
+    <string name="map">Peta</string>
+    <string name="retry">Coba lagi</string>
+    <string name="title_activity_maps">Peta Story</string>
+    <string name="share_location">Bagikan Lokasi</string>
+    <string name="please_wait">Mohon tunggu</string>
+    <string name="exceed_max_size">Ukuran gambar maks. 1 MB</string>
+    <string name="try_again">Coba lagi</string>
 </resources>

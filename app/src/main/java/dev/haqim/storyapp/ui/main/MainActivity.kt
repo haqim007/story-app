@@ -1,28 +1,28 @@
 package dev.haqim.storyapp.ui.main
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
-import androidx.core.view.isVisible
+import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.paging.PagingData
+import androidx.recyclerview.widget.GridLayoutManager
 import dev.haqim.storyapp.R
-import dev.haqim.storyapp.data.mechanism.Resource
 import dev.haqim.storyapp.databinding.ActivityMainBinding
 import dev.haqim.storyapp.di.Injection
+import dev.haqim.storyapp.domain.model.Story
 import dev.haqim.storyapp.ui.add_story.AddStoryActivity
 import dev.haqim.storyapp.ui.base.BaseActivity
 import dev.haqim.storyapp.ui.login.LoginActivity
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import dev.haqim.storyapp.ui.map.StoryMapsActivity
+import dev.haqim.storyapp.ui.story.DetailStoryActivity
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
@@ -42,20 +42,42 @@ class MainActivity : BaseActivity() {
         val uiAction = {action: MainUiAction -> viewModel.processAction(action)}
 
         //setup recyclerview
-        val adapter = setupAdapter()
+        val adapter = setupAdapter(uiAction)
+        
+        val openStoryFlow = uiState.map { it.storyToBeOpened }.distinctUntilChanged()
+        lifecycleScope.launch { 
+            openStoryFlow.collectLatest { 
+                if (it.story != null){
+                    val intent = Intent(
+                        this@MainActivity,
+                        DetailStoryActivity::class.java
+                    )
+                    val bundle = Bundle()
+                    bundle.putParcelable(DetailStoryActivity.DETAIL_STORY, it.story)
+                    intent.putExtras(bundle)
+                    startActivity(intent, it.optionsCompat?.toBundle())
+                    uiAction(MainUiAction.FinishNavigateToDetailStory)
+                }
+            }
+        }
 
         //bindUserData
-        bindUserData(uiState, uiAction)
+        bindUserData(uiState)
 
         // bindStories
-        bindStories(uiState, adapter)
+        bindStories(viewModel.pagingDataFlow, adapter)
 
         // bindNavigateToAddStory
         bindNavigateToAddStory(uiAction, uiState)
 
         binding.srlMain.setOnRefreshListener {
-            uiAction(MainUiAction.GetStories)
+            adapter.refresh()
             binding.srlMain.isRefreshing = false
+        }
+
+        binding.btnShowMap.setOnClickListener {
+            val intent = Intent(this, StoryMapsActivity::class.java)
+            startActivity(intent)
         }
     }
 
@@ -98,73 +120,55 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun setupAdapter(): StoryAdapter {
-        val adapter = StoryAdapter()
-        val layoutManager = LinearLayoutManager(
+    private fun setupAdapter(uiAction: (MainUiAction) -> Boolean): StoryAdapter {
+        val adapter = StoryAdapter(object : StoryAdapterListener{
+
+            override fun onClickStory(
+                context: Context,
+                story: Story?,
+                optionsCompat: ActivityOptionsCompat?,
+            ) {
+                story?.let {
+                    uiAction(MainUiAction.NavigateToDetailStory(story, optionsCompat))
+                }
+            }
+
+        })
+        val layoutManager = GridLayoutManager(
             this,
-            LinearLayoutManager.VERTICAL,
-            false
+            2
         )
         binding.rvStories.layoutManager = layoutManager
         binding.rvStories.adapter = adapter
-        binding.rvStories.addItemDecoration(
-            DividerItemDecoration(
-                baseContext,
-                layoutManager.orientation
-            )
-        )
         return adapter
     }
 
     private fun bindStories(
-        uiState: StateFlow<MainUiState>,
+        pagingData: Flow<PagingData<Story>>,
         adapter: StoryAdapter,
     ) {
-        val storiesFlow = uiState.map { it.stories }.distinctUntilChanged()
-        lifecycleScope.launch {
-            storiesFlow.collectLatest {
-                binding.pbLoader.isVisible = false
-                binding.tvError.isVisible = false
-                when (it) {
-                    is Resource.Loading -> {
-                        binding.rvStories.isVisible = false
-                        binding.pbLoader.isVisible = true
-                    }
-                    is Resource.Success -> {
-                        if (it.data.isNullOrEmpty()) {
-                            binding.tvError.isVisible = true
-                            binding.tvError.text = getString(R.string.empty)
-                        } else {
-                            binding.rvStories.isVisible = true
-                            adapter.submitList(it.data)
-                        }
-                    }
-                    is Resource.Error -> {
-                        binding.tvError.isVisible = true
-                        binding.tvError.text = it.message
-                    }
-                    else -> {}
-                }
+        binding.rvStories.adapter = adapter.withLoadStateFooter(
+            footer = LoadingStateAdapter{
+                adapter.retry()
             }
+        )
+        
+        lifecycleScope.launch { 
+            pagingData.collect(adapter::submitData)
         }
     }
 
     private fun bindUserData(
         uiState: StateFlow<MainUiState>,
-        uiAction: (MainUiAction) -> Boolean,
     ) {
         val userDataFlow = uiState.map { it.userData }.distinctUntilChanged()
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 userDataFlow.collectLatest {
-                    if (it != null) {
-                        if (it.token.isEmpty()) {
-                            val intent = Intent(this@MainActivity, LoginActivity::class.java)
-                            startActivity(intent)
-                            finish()
-                        } else {
-                            uiAction(MainUiAction.GetStories)
-                        }
+                    if (it != null && it.token.isEmpty()) {
+                        val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                        startActivity(intent)
+                        finish()
                     }
                 }
             }

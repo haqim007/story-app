@@ -1,7 +1,7 @@
 package dev.haqim.storyapp.data.remote.response
 
 import com.google.gson.annotations.SerializedName
-import dev.haqim.storyapp.model.BasicMessage
+import dev.haqim.storyapp.domain.model.BasicMessage
 
 data class BasicResponse(
 

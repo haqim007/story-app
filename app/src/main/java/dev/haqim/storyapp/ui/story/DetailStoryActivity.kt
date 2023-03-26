@@ -6,7 +6,8 @@ import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import dev.haqim.storyapp.R
 import dev.haqim.storyapp.databinding.ActivityDetailStoryBinding
-import dev.haqim.storyapp.model.Story
+import dev.haqim.storyapp.domain.model.Story
+import dev.haqim.storyapp.helper.util.wrapEspressoIdlingResource
 import dev.haqim.storyapp.ui.base.BaseActivity
 
 class DetailStoryActivity : BaseActivity() {
@@ -30,8 +31,18 @@ class DetailStoryActivity : BaseActivity() {
             binding.tvFullName.text = story.name
             binding.tvCreatedAt.text = story.createdAt
             binding.tvDescription.text = story.description
-            Glide.with(this).load(story.photoUrl).placeholder(R.drawable.outline_image_search_24)
-                .error(R.drawable.outline_broken_image_24).centerCrop().into(binding.imgPhoto)
+//            Glide.with(this).load(story.photoUrl).placeholder(R.drawable.outline_image_search_24)
+//                .error(R.drawable.outline_broken_image_24).centerCrop().into(binding.imgPhoto)
+//            
+            Glide.with(this)
+                .load(story.photoUrl).placeholder(R.drawable.outline_image_search_24)
+                .error(R.drawable.outline_broken_image_24)
+                .centerCrop()
+                .into(
+                    wrapEspressoIdlingResource {
+                        binding.imgPhoto
+                    }
+                )
         } ?: kotlin.run {
             binding.tvError.isVisible = true
             binding.clContent.isVisible = false

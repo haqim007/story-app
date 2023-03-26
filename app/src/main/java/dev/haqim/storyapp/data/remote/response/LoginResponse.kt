@@ -1,8 +1,8 @@
 package dev.haqim.storyapp.data.remote.response
 
 import com.google.gson.annotations.SerializedName
-import dev.haqim.storyapp.model.Login
-import dev.haqim.storyapp.model.User
+import dev.haqim.storyapp.domain.model.Login
+import dev.haqim.storyapp.domain.model.User
 
 data class LoginResponse(
 

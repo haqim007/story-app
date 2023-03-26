@@ -12,10 +12,11 @@ import dev.haqim.storyapp.R
 import dev.haqim.storyapp.data.mechanism.Resource
 import dev.haqim.storyapp.databinding.ActivityRegistrationBinding
 import dev.haqim.storyapp.di.Injection.provideViewModelProvider
+import dev.haqim.storyapp.helper.util.InputValidation
+import dev.haqim.storyapp.helper.util.ResultInput
 import dev.haqim.storyapp.ui.base.BaseActivity
 import dev.haqim.storyapp.ui.login.LoginActivity
-import dev.haqim.storyapp.ui.mechanism.InputValidation
-import dev.haqim.storyapp.ui.mechanism.ResultInput
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -80,6 +81,7 @@ class RegistrationActivity : BaseActivity() {
         val submitFlow = uiState.map { it.submitResult }.distinctUntilChanged()
         lifecycleScope.launch {
             submitFlow.collectLatest {
+                
                 binding.registerBtn.setLoading(false)
                 binding.registerBtn.setEnable(uiState.value.allInputValid)
 
@@ -95,17 +97,18 @@ class RegistrationActivity : BaseActivity() {
                         }
                     }
                     is Resource.Success -> {
-                        val mySnackBar = Snackbar.make(binding.coordinator,
+                        val mySnackBar = Snackbar.make(binding.clRegistration,
                             getString(R.string.registered_successfully),
                             Snackbar.LENGTH_INDEFINITE
-                        ).setAction(R.string.log_in){
+                        )
+                        mySnackBar.show()
+                        lifecycleScope.launch { 
+                            delay(3000)
                             uiAction(RegistrationUiAction.NavigateToLogin())
                         }
-                        mySnackBar.show()
-
                     }
                     is Resource.Error -> {
-                        val mySnackBar = Snackbar.make(binding.coordinator,
+                        val mySnackBar = Snackbar.make(binding.clRegistration,
                             it.message ?: getString(R.string.failed_to_register),
                             Snackbar.LENGTH_LONG
                         )
