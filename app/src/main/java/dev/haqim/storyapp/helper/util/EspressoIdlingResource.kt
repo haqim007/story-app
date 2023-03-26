@@ -1,6 +1,7 @@
 package dev.haqim.storyapp.helper.util
 
 import androidx.test.espresso.idling.CountingIdlingResource
+import java.util.concurrent.atomic.AtomicBoolean
 
 object EspressoIdlingResource {
     var RESOURCE = "GLOBAL"
@@ -21,9 +22,8 @@ object EspressoIdlingResource {
             countingIdlingResource.decrement()
         }
     }
-    
-    
 }
+
 
 /*
 * It increments the EspressoIdlingResource before calling the function, 
@@ -32,10 +32,29 @@ object EspressoIdlingResource {
 * the CountingIdlingResource.
 * */
 inline fun <T> wrapEspressoIdlingResource(function: () -> T): T{
-    EspressoIdlingResource.increment() // Set app as busy.
-    return try {
+    return if(isRunningTest()){
+        EspressoIdlingResource.increment() // Set app as busy.
+        try {
+            function()
+        }finally {
+            EspressoIdlingResource.decrement() // Set app as idle.
+        }
+    }else{
         function()
-    }finally {
-        EspressoIdlingResource.decrement() // Set app as idle.
     }
+}
+
+private var isRunningTest: AtomicBoolean? = null
+@Synchronized
+fun isRunningTest(): Boolean {
+    if (null == isRunningTest) {
+        val isTest: Boolean = try {
+            Class.forName("androidx.test.espresso.Espresso")
+            true
+        } catch (e: ClassNotFoundException) {
+            false
+        }
+        isRunningTest = AtomicBoolean(isTest)
+    }
+    return isRunningTest!!.get()
 }

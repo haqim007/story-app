@@ -11,9 +11,9 @@ import kotlinx.coroutines.flow.*
 abstract class NetworkBoundResource<ResultType, RequestType> {
 
     private val result: Flow<Resource<ResultType>> = flow{
-        
+
+        emit(Resource.Loading())
         wrapEspressoIdlingResource {
-            emit(Resource.Loading())
             try {
                 val apiResponse = fetchFromRemote().first()
                 if(apiResponse.isSuccess){

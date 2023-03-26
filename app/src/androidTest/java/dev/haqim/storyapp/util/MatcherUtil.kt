@@ -6,15 +6,25 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.View
+import android.view.View.OnLayoutChangeListener
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
+import androidx.test.espresso.action.ViewActions.actionWithAssertions
 import androidx.test.espresso.matcher.BoundedMatcher
+import androidx.test.espresso.matcher.ViewMatchers
 import com.google.android.material.textfield.TextInputLayout
 import dev.haqim.storyapp.ui.custom_view.CustomPasswordEditText
 import org.hamcrest.Description
 import org.hamcrest.Matcher
+import org.hamcrest.StringDescription
 import org.hamcrest.TypeSafeMatcher
+
 
 fun textInputLayoutHintText(expectedHintText: String): Matcher<View>{
     
@@ -107,3 +117,86 @@ fun withDrawable(@DrawableRes expectedDrawableRes: Int): BoundedMatcher<View, Im
     }
 }
 
+fun recyclerViewSizeMatcher(matcherSize: Int): Matcher<View?> {
+    return object : BoundedMatcher<View?, RecyclerView>(RecyclerView::class.java) {
+        override fun describeTo(description: Description) {
+            description.appendText("with list size: $matcherSize")
+        }
+
+        override fun matchesSafely(recyclerView: RecyclerView): Boolean {
+            return matcherSize == recyclerView.adapter!!.itemCount
+        }
+    }
+}
+
+fun recyclerViewIsNotEmptyMatcher(): Matcher<View?> {
+    return object : BoundedMatcher<View?, RecyclerView>(RecyclerView::class.java) {
+        override fun describeTo(description: Description) {
+            description.appendText("list is not empty")
+        }
+
+        override fun matchesSafely(recyclerView: RecyclerView): Boolean {
+            return recyclerView.adapter!!.itemCount != 0
+        }
+    }
+}
+
+fun waitUntil(matcher: Matcher<View?>): ViewAction? {
+    return actionWithAssertions(object : ViewAction {
+        override fun getConstraints(): Matcher<View> {
+            return ViewMatchers.isAssignableFrom(View::class.java)
+        }
+
+        override fun getDescription(): String {
+            val description = StringDescription()
+            matcher.describeTo(description)
+            return java.lang.String.format("wait until: %s", description)
+        }
+
+        override fun perform(uiController: UiController, view: View) {
+            if (!matcher.matches(view)) {
+                val callback = LayoutChangeCallback(matcher)
+                try {
+                    IdlingRegistry.getInstance().register(callback)
+                    view.addOnLayoutChangeListener(callback)
+                    uiController.loopMainThreadUntilIdle()
+                } finally {
+                    view.removeOnLayoutChangeListener(callback)
+                    IdlingRegistry.getInstance().unregister(callback)
+                }
+            }
+        }
+    })
+}
+
+private class LayoutChangeCallback(private val matcher: Matcher<View?>) :
+    IdlingResource, OnLayoutChangeListener {
+    private var callback: IdlingResource.ResourceCallback? = null
+    private var matched = false
+    override fun getName(): String {
+        return "Layout change callback"
+    }
+
+    override fun isIdleNow(): Boolean {
+        return matched
+    }
+
+    override fun registerIdleTransitionCallback(callback: IdlingResource.ResourceCallback) {
+        this.callback = callback
+    }
+
+    override fun onLayoutChange(
+        v: View,
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int,
+        oldLeft: Int,
+        oldTop: Int,
+        oldRight: Int,
+        oldBottom: Int,
+    ) {
+        matched = matcher.matches(v)
+        callback!!.onTransitionToIdle()
+    }
+}

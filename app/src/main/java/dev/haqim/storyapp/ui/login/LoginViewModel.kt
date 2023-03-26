@@ -69,11 +69,12 @@ class LoginViewModel(
                 }
             }
             is LoginUiAction.NavigateToHome -> {
-                _uiState.update { state -> state.copy(navigateToHome = !state.navigateToHome) }
+                _uiState.update { state -> 
+                    state.copy(navigateToHome = !state.navigateToHome) 
+                }
             }
             is LoginUiAction.NavigateToRegistration -> {
                 _uiState.update { state -> state.copy(navigateToRegistration = !state.navigateToRegistration) }
-//                EspressoIdlingResource.decrement()
             }
         }
     }

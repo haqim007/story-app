@@ -16,8 +16,9 @@ import dev.haqim.storyapp.R
 import dev.haqim.storyapp.data.remote.network.ApiConfig
 import dev.haqim.storyapp.data.remote.response.StoriesResponse
 import dev.haqim.storyapp.helper.util.TimeAgo
-import dev.haqim.storyapp.helper.util.wrapEspressoIdlingResource
 import dev.haqim.storyapp.util.JsonConverter
+import dev.haqim.storyapp.util.recyclerViewIsNotEmptyMatcher
+import dev.haqim.storyapp.util.waitUntil
 import dev.haqim.storyapp.util.withDrawable
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
@@ -83,10 +84,11 @@ class MainActivityTest{
         val stories = Gson().fromJson(response, StoriesResponse::class.java)
         val firstStory = stories.listStory[0]
         mockWebServer.enqueue(mockResponse)
-        
+//      Thread.sleep(1000)
         onView(withId(R.id.rv_stories))
             .check(matches(isDisplayed()))
             .perform(
+                waitUntil(recyclerViewIsNotEmptyMatcher()),
                 RecyclerViewActions
                     .actionOnItemAtPosition<RecyclerView.ViewHolder>(
                         0, click()
@@ -106,12 +108,10 @@ class MainActivityTest{
         onView(allOf(withId(R.id.tvDescription), isDescendantOfA(withId(R.id.nslDetailStory))))
             .check(matches(withText(firstStory.description)))
         //check image with glide
-        wrapEspressoIdlingResource {
-            onView(allOf(withId(R.id.imgPhoto), isDescendantOfA(withId(R.id.nslDetailStory))))
-                .check(matches(isDisplayed()))
-                .check(matches(not(withDrawable(R.drawable.outline_image_search_24))))
-                .check(matches(not(withDrawable(R.drawable.outline_broken_image_24))))
-        }
+        onView(allOf(withId(R.id.imgPhoto), isDescendantOfA(withId(R.id.nslDetailStory))))
+            .check(matches(isDisplayed()))
+            .check(matches(not(withDrawable(R.drawable.outline_image_search_24))))
+            .check(matches(not(withDrawable(R.drawable.outline_broken_image_24))))
     }
 
 }

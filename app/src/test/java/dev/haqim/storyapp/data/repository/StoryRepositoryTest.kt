@@ -110,24 +110,26 @@ class StoryRepositoryTest {
     
     @Test
     fun `When register() Should return Loading and Success`() = runTest{
-        val email = "haqim@mail.com"
-        val name = "haqim"
+        val email = "malih@mail.com"
+        val name = "malih"
         val password = "!2345678"
 
         repository = sutSuccess(name, email, password)
+        
 
         repository.register(name, email, password).test {
             verify(remoteDataSource).register(name, email, password)
 
             val emissionLoading = awaitItem()
             assertTrue(emissionLoading is Resource.Loading)
-            
+
             val emissionSuccess = awaitItem()
             assertTrue(emissionSuccess is Resource.Success)
             assertEquals(DataDummy.basicMessageSuccess(), emissionSuccess.data)
 
             cancelAndIgnoreRemainingEvents()
         }
+        
 
     }
 
@@ -219,7 +221,8 @@ class StoryRepositoryTest {
         
         repository.getStoriesWithLocation(4, 1).test {
             // first emission is loading
-            assertTrue(awaitItem() is Resource.Loading)
+            val loadingEmission = awaitItem()
+            assertTrue(loadingEmission is Resource.Loading)
             verify(remoteDataSource).getStories(1, 4, 1)
             val storyEntities = DataDummy.listStoryResponse().toEntity()
             verify(localDataSource).insertAllStories(storyEntities)
