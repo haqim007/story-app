@@ -1,6 +1,7 @@
 package dev.haqim.storyapp.data.remote
 
 import app.cash.turbine.test
+import dev.haqim.storyapp.data.mechanism.HttpResult
 import dev.haqim.storyapp.data.preferences.UserPreference
 import dev.haqim.storyapp.data.remote.network.ApiService
 import dev.haqim.storyapp.helper.util.RequestBodyUtil
@@ -53,8 +54,8 @@ class RemoteDataSourceTest {
             verify(service).register(name, email, password)
             val emission = awaitItem()
             
-            assertTrue(emission.isSuccess)
-            assertEquals(Result.success(DataDummy.basicResponseSuccess()), emission)
+            assertTrue(emission is HttpResult.Success)
+            assertEquals(DataDummy.basicResponseSuccess(), emission.data)
             assertFalse(DataDummy.basicMessageSuccess().error)
             
             cancelAndIgnoreRemainingEvents()
@@ -80,8 +81,8 @@ class RemoteDataSourceTest {
         remoteDataSource.register(name, email, password).test {
             verify(service).register(name, email, password)
             val emission = awaitItem()
-            assertEquals("token expired", emission.exceptionOrNull()?.localizedMessage)
-            assertTrue(emission.isFailure)
+            assertEquals("token expired", emission.message)
+            assertTrue(emission is HttpResult.Error)
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -101,8 +102,8 @@ class RemoteDataSourceTest {
             verify(service).login(email, password)
             val emission = awaitItem()
 
-            assertTrue(emission.isSuccess)
-            assertEquals(Result.success(DataDummy.loginResponse()), emission)
+            assertTrue(emission is HttpResult.Success)
+            assertEquals(DataDummy.loginResponse(), emission.data)
             assertFalse(DataDummy.basicMessageSuccess().error)
 
             cancelAndIgnoreRemainingEvents()
@@ -127,8 +128,8 @@ class RemoteDataSourceTest {
         remoteDataSource.login(email, password).test {
             verify(service).login(email, password)
             val emission = awaitItem()
-            assertEquals("email empty", emission.exceptionOrNull()?.localizedMessage)
-            assertTrue(emission.isFailure)
+            assertEquals("email empty", emission.message)
+            assertTrue(emission is HttpResult.Error)
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -155,8 +156,8 @@ class RemoteDataSourceTest {
             verify(service).getAllStories(page, size, location, token)
             val emission = awaitItem()
 
-            assertTrue(emission.isSuccess)
-            assertEquals(Result.success(DataDummy.storiesResponse()), emission)
+            assertTrue(emission is HttpResult.Success)
+            assertEquals(DataDummy.storiesResponse(), emission.data)
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -186,8 +187,8 @@ class RemoteDataSourceTest {
         remoteDataSource.getStories(page, size, location).test {
             verify(service).getAllStories(page, size, location, token)
             val emission = awaitItem()
-            assertEquals("token expired", emission.exceptionOrNull()?.localizedMessage)
-            assertTrue(emission.isFailure)
+            assertEquals("token expired", emission.message)
+            assertTrue(emission is HttpResult.Error)
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -231,8 +232,8 @@ class RemoteDataSourceTest {
             )
 
             val successEmission = awaitItem()
-            assertTrue(successEmission.isSuccess)
-            assertEquals(DataDummy.basicResponseSuccess(), successEmission.getOrNull())
+            assertTrue(successEmission is HttpResult.Success)
+            assertEquals(DataDummy.basicResponseSuccess(), successEmission.data)
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -277,8 +278,8 @@ class RemoteDataSourceTest {
             )
 
             val emission = awaitItem()
-            assertTrue(emission.isFailure)
-            assertEquals("failed to add new story", emission.exceptionOrNull()?.localizedMessage)
+            assertTrue(emission is HttpResult.Error)
+            assertEquals("failed to add new story", emission.message)
 
             cancelAndIgnoreRemainingEvents()
         }

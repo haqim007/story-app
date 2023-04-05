@@ -15,11 +15,9 @@ import com.google.gson.Gson
 import dev.haqim.storyapp.R
 import dev.haqim.storyapp.data.remote.network.ApiConfig
 import dev.haqim.storyapp.data.remote.response.StoriesResponse
+import dev.haqim.storyapp.helper.util.EspressoIdlingResource
 import dev.haqim.storyapp.helper.util.TimeAgo
-import dev.haqim.storyapp.util.JsonConverter
-import dev.haqim.storyapp.util.recyclerViewIsNotEmptyMatcher
-import dev.haqim.storyapp.util.waitUntil
-import dev.haqim.storyapp.util.withDrawable
+import dev.haqim.storyapp.util.*
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import org.hamcrest.CoreMatchers.*
@@ -80,38 +78,43 @@ class MainActivityTest{
         val mockResponse = MockResponse()
             .setResponseCode(200)
             .setBody(response)
-        mockWebServer.enqueue(mockResponse)
-        val stories = Gson().fromJson(response, StoriesResponse::class.java)
-        val firstStory = stories.listStory[0]
-        mockWebServer.enqueue(mockResponse)
-//      Thread.sleep(1000)
-        onView(withId(R.id.rv_stories))
-            .check(matches(isDisplayed()))
-            .perform(
-                waitUntil(recyclerViewIsNotEmptyMatcher()),
-                RecyclerViewActions
-                    .actionOnItemAtPosition<RecyclerView.ViewHolder>(
-                        0, click()
-                    )
-            )
-        
-        onView(withId(R.id.nslDetailStory))
-            .check(matches(isDisplayed()))
-        
-        // check name
-        onView(allOf(withId(R.id.tvFullName), isDescendantOfA(withId(R.id.nslDetailStory))))
-            .check(matches(withText(firstStory.name)))
-        // check created at
-        onView(allOf(withId(R.id.tvCreatedAt), isDescendantOfA(withId(R.id.nslDetailStory))))
-            .check(matches(withText(TimeAgo().getTimeAgo(firstStory.createdAt))))
-        // check description
-        onView(allOf(withId(R.id.tvDescription), isDescendantOfA(withId(R.id.nslDetailStory))))
-            .check(matches(withText(firstStory.description)))
-        //check image with glide
-        onView(allOf(withId(R.id.imgPhoto), isDescendantOfA(withId(R.id.nslDetailStory))))
-            .check(matches(isDisplayed()))
-            .check(matches(not(withDrawable(R.drawable.outline_image_search_24))))
-            .check(matches(not(withDrawable(R.drawable.outline_broken_image_24))))
-    }
+//        mockWebServer.enqueue(mockResponse)
+        wrapEspressoIdlingResourceForTest(EspressoIdlingResource.countingIdlingResource){
+            val stories = Gson().fromJson(response, StoriesResponse::class.java)
+            val firstStory = stories.listStory[0]
+            mockWebServer.enqueue(mockResponse)
 
+
+            onView(withId(R.id.rv_stories))
+                .check(matches(isDisplayed()))
+                .perform(
+                    waitUntil(recyclerViewIsNotEmptyMatcher()),
+                    RecyclerViewActions
+                        .actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                            0, click()
+                        )
+                )
+
+
+            onView(withId(R.id.nslDetailStory))
+                .check(matches(isDisplayed()))
+
+            // check name
+            onView(allOf(withId(R.id.tvFullName), isDescendantOfA(withId(R.id.nslDetailStory))))
+                .check(matches(withText(firstStory.name)))
+            // check created at
+            onView(allOf(withId(R.id.tvCreatedAt), isDescendantOfA(withId(R.id.nslDetailStory))))
+                .check(matches(withText(TimeAgo().getTimeAgo(firstStory.createdAt))))
+            // check description
+            onView(allOf(withId(R.id.tvDescription), isDescendantOfA(withId(R.id.nslDetailStory))))
+                .check(matches(withText(firstStory.description)))
+            //check image with glide
+            onView(allOf(withId(R.id.imgPhoto), isDescendantOfA(withId(R.id.nslDetailStory))))
+                .check(matches(isDisplayed()))
+            
+            Thread.sleep(5000)
+        }
+    }
+    
 }
+

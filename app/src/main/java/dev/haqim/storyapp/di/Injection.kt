@@ -26,7 +26,7 @@ object Injection {
         val userPreference = provideUserPreference(context)
         val localDataSource = provideLocalDataSource(context)
         val remoteMediator: StoryRemoteMediator = provideStoryRemoteMediator(
-            localDataSource, remoteDataSource
+            localDataSource, remoteDataSource, userPreference
         )
         val repository = provideRepository(
             remoteDataSource, userPreference, localDataSource, remoteMediator
@@ -38,8 +38,9 @@ object Injection {
 
     private fun provideStoryRemoteMediator(
         localDataSource: LocalDataSource,
-        remoteDataSource: RemoteDataSource
-    ) = StoryRemoteMediator(localDataSource, remoteDataSource)
+        remoteDataSource: RemoteDataSource,
+        userPreference: UserPreference
+    ) = StoryRemoteMediator(localDataSource, remoteDataSource, userPreference)
 
     private fun provideRepository(
         remoteDataSource: RemoteDataSource,

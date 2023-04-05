@@ -3,6 +3,8 @@ package dev.haqim.storyapp.data.remoteMediator
 import androidx.paging.*
 import dev.haqim.storyapp.data.local.LocalDataSource
 import dev.haqim.storyapp.data.local.entity.StoryEntity
+import dev.haqim.storyapp.data.mechanism.HttpResult
+import dev.haqim.storyapp.data.preferences.UserPreference
 import dev.haqim.storyapp.data.remote.RemoteDataSource
 import dev.haqim.storyapp.data.remote.response.StoriesResponse
 import dev.haqim.storyapp.util.DataDummy
@@ -31,11 +33,13 @@ class StoryRemoteMediatorTest {
     private lateinit var localDataSource: LocalDataSource
     @Mock
     private lateinit var remoteDataSource: RemoteDataSource
+    @Mock
+    private lateinit var userPreference: UserPreference
     private lateinit var storyRemoteMediator: StoryRemoteMediator
 
     @Before
     fun setup() {
-        storyRemoteMediator = StoryRemoteMediator(localDataSource, remoteDataSource)
+        storyRemoteMediator = StoryRemoteMediator(localDataSource, remoteDataSource, userPreference)
     }
 
     
@@ -49,7 +53,7 @@ class StoryRemoteMediatorTest {
             0
         )
 
-        val response = Result.success(DataDummy.storiesResponse())
+        val response = HttpResult.Success(DataDummy.storiesResponse())
         val flow = flowOf(response)
         `when`(remoteDataSource.getStories(1, 4)).thenReturn(flow)
         
@@ -71,7 +75,7 @@ class StoryRemoteMediatorTest {
             0
         )
 
-        val response = Result.success(
+        val response = HttpResult.Success(
             StoriesResponse(
                 listStory = listOf(),
                 error = false,
@@ -100,10 +104,10 @@ class StoryRemoteMediatorTest {
         )
 
         val exception = RuntimeException("Something went wrong!")
-        val flow = flow<Result<StoriesResponse>> { throw exception }
+        val flow = flow<HttpResult<StoriesResponse>> { throw exception }
         `when`(remoteDataSource.getStories(1, 4)).thenReturn(flow)
         
-        val myStoryRemoteMediator = StoryRemoteMediator(localDataSource, remoteDataSource)
+        val myStoryRemoteMediator = StoryRemoteMediator(localDataSource, remoteDataSource, userPreference)
         
 
         val result = myStoryRemoteMediator.load(LoadType.REFRESH, pagingState)

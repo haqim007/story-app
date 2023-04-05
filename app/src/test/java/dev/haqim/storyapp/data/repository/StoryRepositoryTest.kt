@@ -3,6 +3,7 @@ package dev.haqim.storyapp.data.repository
 import androidx.paging.*
 import app.cash.turbine.test
 import dev.haqim.storyapp.data.local.LocalDataSource
+import dev.haqim.storyapp.data.mechanism.HttpResult
 import dev.haqim.storyapp.data.mechanism.Resource
 import dev.haqim.storyapp.data.preferences.UserPreference
 import dev.haqim.storyapp.data.remote.RemoteDataSource
@@ -51,13 +52,13 @@ class StoryRepositoryTest {
         
         `when`(remoteDataSource.register(name, email, password)).thenReturn(
             flow {
-                emit(Result.success(DataDummy.basicResponseSuccess()))
+                emit(HttpResult.Success(DataDummy.basicResponseSuccess()))
             }
         )
 
         `when`(remoteDataSource.login(email, password)).thenReturn(
             flow {
-                emit(Result.success(DataDummy.loginResponse()))
+                emit(HttpResult.Success(DataDummy.loginResponse()))
             }
         )
 
@@ -75,7 +76,7 @@ class StoryRepositoryTest {
         }
         
         `when`(remoteDataSource.getStories(1, 4, 1)).thenReturn(
-            flowOf(Result.success(DataDummy.storiesResponse()))
+            flowOf(HttpResult.Success(DataDummy.storiesResponse()))
         )
         
         return StoryRepository(remoteDataSource, userPreference, localDataSource, remoteMediator)
@@ -89,18 +90,18 @@ class StoryRepositoryTest {
         
         `when`(remoteDataSource.register(name, email, password)).thenReturn(
             flow {
-                emit(Result.failure(DataDummy.basicResponseError()))
+                emit(HttpResult.Error(DataDummy.basicResponseError().localizedMessage ?: ""))
             }
         )
 
         `when`(remoteDataSource.login(email, password)).thenReturn(
             flow {
-                emit(Result.failure(DataDummy.basicResponseError()))
+                emit(HttpResult.Error(DataDummy.basicResponseError().localizedMessage ?: ""))
             }
         )
 
         `when`(remoteDataSource.getStories(1, 4, 1)).thenReturn(
-            flowOf(Result.failure(DataDummy.basicResponseError()))
+            flowOf(HttpResult.Error(DataDummy.basicResponseError().localizedMessage ?: ""))
         )
 
         return StoryRepository(remoteDataSource, userPreference, localDataSource, remoteMediator)
@@ -285,7 +286,7 @@ class StoryRepositoryTest {
         `when`(remoteDataSource.addStory(file, description, lon, lat))
             .thenReturn(
                 flow{
-                    emit(Result.success(DataDummy.basicResponseSuccess()))
+                    emit(HttpResult.Success(DataDummy.basicResponseSuccess()))
                 }
             )
         
@@ -318,7 +319,7 @@ class StoryRepositoryTest {
         `when`(remoteDataSource.addStory(file, description, lon, lat))
             .thenReturn(
                 flow{
-                    emit(Result.failure(DataDummy.basicResponseError()))
+                    emit(HttpResult.Error(DataDummy.basicResponseError().localizedMessage ?: ""))
                 }
             )
 

@@ -54,8 +54,8 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
             preferences[LANGUAGE_KEY] = "en"
         }
     }
-    
-    
+
+
     companion object {
         @Volatile
         private var INSTANCE: UserPreference? = null

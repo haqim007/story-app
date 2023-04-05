@@ -31,9 +31,7 @@ class DetailStoryActivity : BaseActivity() {
             binding.tvFullName.text = story.name
             binding.tvCreatedAt.text = story.createdAt
             binding.tvDescription.text = story.description
-//            Glide.with(this).load(story.photoUrl).placeholder(R.drawable.outline_image_search_24)
-//                .error(R.drawable.outline_broken_image_24).centerCrop().into(binding.imgPhoto)
-//            
+    
             Glide.with(this)
                 .load(story.photoUrl).placeholder(R.drawable.outline_image_search_24)
                 .error(R.drawable.outline_broken_image_24)

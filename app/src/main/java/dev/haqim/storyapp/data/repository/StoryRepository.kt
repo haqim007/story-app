@@ -3,6 +3,7 @@ package dev.haqim.storyapp.data.repository
 import androidx.paging.*
 import dev.haqim.storyapp.data.local.LocalDataSource
 import dev.haqim.storyapp.data.local.entity.toModel
+import dev.haqim.storyapp.data.mechanism.HttpResult
 import dev.haqim.storyapp.data.mechanism.NetworkBoundResource
 import dev.haqim.storyapp.data.mechanism.Resource
 import dev.haqim.storyapp.data.preferences.UserPreference
@@ -29,7 +30,7 @@ class StoryRepository(
         name: String, email: String, password: String
     ): Flow<Resource<BasicMessage>> {
         return object : NetworkBoundResource<BasicMessage, BasicResponse>(){
-            override fun fetchFromRemote(): Flow<Result<BasicResponse>> {
+            override fun fetchFromRemote(): Flow<HttpResult<BasicResponse>> {
                 return remoteDataSource.register( name, email, password)
             }
     
@@ -38,13 +39,15 @@ class StoryRepository(
             }
     
             override suspend fun saveRemoteData(data: BasicResponse) {}
+
+            override suspend fun resetUserAuth() {}
     
         }.asFlow()
     }
 
     override fun login(email: String, password: String): Flow<Resource<Login>> {
         return object : NetworkBoundResource<Login, LoginResponse>(){
-            override fun fetchFromRemote(): Flow<Result<LoginResponse>> {
+            override fun fetchFromRemote(): Flow<HttpResult<LoginResponse>> {
                 return remoteDataSource.login(email, password)
             }
 
@@ -63,6 +66,8 @@ class StoryRepository(
                 )
             }
 
+            override suspend fun resetUserAuth() {}
+
         }.asFlow()
     }
 
@@ -73,7 +78,7 @@ class StoryRepository(
     override fun getStoriesWithLocation(pageSize: Int, page: Int): Flow<Resource<List<Story>>> {
         return object: NetworkBoundResource<List<Story>, StoriesResponse>(){
 
-            override fun fetchFromRemote(): Flow<Result<StoriesResponse>> {
+            override fun fetchFromRemote(): Flow<HttpResult<StoriesResponse>> {
                 return remoteDataSource.getStories(page, pageSize, 1)
             }
 
@@ -84,6 +89,10 @@ class StoryRepository(
 
             override fun loadResultData(data: StoriesResponse): Flow<List<Story>> {
                 return localDataSource.getAllStoriesWithLocation().map { it.toModel() }
+            }
+
+            override suspend fun resetUserAuth() {
+                userPreference.logout()
             }
 
         }.asFlow()
@@ -114,7 +123,7 @@ class StoryRepository(
     ): Flow<Resource<BasicMessage>> {
         return object: NetworkBoundResource<BasicMessage, BasicResponse>(){
 
-            override fun fetchFromRemote(): Flow<Result<BasicResponse>> {
+            override fun fetchFromRemote(): Flow<HttpResult<BasicResponse>> {
                 return remoteDataSource.addStory(
                     file = file,
                     description = description,
@@ -129,6 +138,10 @@ class StoryRepository(
                 return flowOf(data.toModel())
             }
 
+            override suspend fun resetUserAuth() {
+                userPreference.logout()
+            }
+            
         }.asFlow()
     }
 

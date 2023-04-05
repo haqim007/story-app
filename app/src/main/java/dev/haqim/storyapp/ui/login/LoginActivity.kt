@@ -166,7 +166,6 @@ class LoginActivity : BaseActivity() {
         val intent = Intent(this, RegistrationActivity::class.java)
         startActivity(intent)
         uiAction(LoginUiAction.NavigateToRegistration)
-        finish()
     }
 
 

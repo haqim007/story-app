@@ -7,6 +7,8 @@ import androidx.paging.RemoteMediator
 import dev.haqim.storyapp.data.local.LocalDataSource
 import dev.haqim.storyapp.data.local.entity.RemoteKeys
 import dev.haqim.storyapp.data.local.entity.StoryEntity
+import dev.haqim.storyapp.data.mechanism.HttpResult
+import dev.haqim.storyapp.data.preferences.UserPreference
 import dev.haqim.storyapp.data.remote.RemoteDataSource
 import dev.haqim.storyapp.data.remote.response.toEntity
 import kotlinx.coroutines.flow.first
@@ -14,7 +16,8 @@ import kotlinx.coroutines.flow.first
 @OptIn(ExperimentalPagingApi::class)
 class StoryRemoteMediator(
     private val localDataSource: LocalDataSource,
-    private val remoteDataSource: RemoteDataSource
+    private val remoteDataSource: RemoteDataSource,
+    private val userPreference: UserPreference
 ): RemoteMediator<Int, StoryEntity>() {
     override suspend fun load(loadType: LoadType, state: PagingState<Int, StoryEntity>): MediatorResult {
         
@@ -38,23 +41,34 @@ class StoryRemoteMediator(
         }
         
         return try {
-            val response = remoteDataSource.getStories(page, state.config.pageSize).first()
-            val endOfPaginationReached = response.getOrNull()?.listStory?.isEmpty() ?: true
-            
-            val prevKey = if (page == 1) null else page - 1
-            val nextKey = if (endOfPaginationReached) null else page + 1
-            val stories = response.getOrNull()?.listStory
-            val keys = stories?.map {
-                RemoteKeys(id = it.id, prevKey, nextKey)
-            } ?: listOf()
+            when(val response = remoteDataSource.getStories(page, state.config.pageSize).first()){
+                is HttpResult.Success -> {
+                    val endOfPaginationReached = response.data?.listStory?.isEmpty() ?: true
 
-            localDataSource.insertKeysAndStories(
-                keys,
-                stories.toEntity(),
-                loadType == LoadType.REFRESH
-            )
+                    val prevKey = if (page == 1) null else page - 1
+                    val nextKey = if (endOfPaginationReached) null else page + 1
+                    val stories = response.data?.listStory
+                    val keys = stories?.map {
+                        RemoteKeys(id = it.id, prevKey, nextKey)
+                    } ?: listOf()
+
+                    localDataSource.insertKeysAndStories(
+                        keys,
+                        stories.toEntity(),
+                        loadType == LoadType.REFRESH
+                    )
+
+                    MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
+                }
+                is HttpResult.Unauthorized -> {
+                    userPreference.logout()
+                    throw Exception()
+                }
+                else -> {
+                    throw Exception()
+                }
+            }
             
-            MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
         }catch (e: Exception){
             MediatorResult.Error(e)
         }

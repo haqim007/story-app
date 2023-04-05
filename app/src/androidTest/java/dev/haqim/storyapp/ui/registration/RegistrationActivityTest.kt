@@ -111,7 +111,7 @@ class RegistrationActivityTest{
             withId(R.id.ed_register_name)
         )
             .perform(click())
-            .perform(typeTextIntoFocusedView(name))
+            .perform(typeTextIntoFocusedView(name), closeSoftKeyboard())
 
         // Retest button register state after input email
         testBtnRegisterInitState()
@@ -124,7 +124,7 @@ class RegistrationActivityTest{
             )
         )
             .perform(click())
-            .perform(typeTextIntoFocusedView(email))
+            .perform(typeTextIntoFocusedView(email), closeSoftKeyboard())
 
         // Retest button register state after input email
         testBtnRegisterInitState()
@@ -189,7 +189,7 @@ class RegistrationActivityTest{
             withId(R.id.ed_register_name)
         )
             .perform(click())
-            .perform(typeTextIntoFocusedView(name))
+            .perform(typeTextIntoFocusedView(name), closeSoftKeyboard())
 
         // Retest button register state after input email
         testBtnRegisterInitState()
@@ -202,7 +202,7 @@ class RegistrationActivityTest{
             )
         )
             .perform(click())
-            .perform(typeTextIntoFocusedView(email))
+            .perform(typeTextIntoFocusedView(email), closeSoftKeyboard())
 
         // Retest button register state after input email
         testBtnRegisterInitState()
@@ -233,7 +233,7 @@ class RegistrationActivityTest{
             withId(R.id.ed_register_name)
         )
             .perform(click())
-            .perform(typeTextIntoFocusedView(name))
+            .perform(typeTextIntoFocusedView(name), closeSoftKeyboard())
 
         // Retest button register state after input email
         testBtnRegisterInitState()
@@ -246,7 +246,7 @@ class RegistrationActivityTest{
             )
         )
             .perform(click())
-            .perform(typeTextIntoFocusedView("email"))
+            .perform(typeTextIntoFocusedView("email"), closeSoftKeyboard())
 
         // Retest button register state after input email
         testBtnRegisterInitState()
@@ -277,7 +277,7 @@ class RegistrationActivityTest{
             withId(R.id.ed_register_name)
         )
             .perform(click())
-            .perform(typeTextIntoFocusedView(""))
+            .perform(typeTextIntoFocusedView(""), closeSoftKeyboard())
 
         // Retest button register state after input email
         testBtnRegisterInitState()
@@ -290,7 +290,7 @@ class RegistrationActivityTest{
             )
         )
             .perform(click())
-            .perform(typeTextIntoFocusedView(email))
+            .perform(typeTextIntoFocusedView(email), closeSoftKeyboard())
 
         // Retest button register state after input email
         testBtnRegisterInitState()
@@ -321,7 +321,7 @@ class RegistrationActivityTest{
             withId(R.id.ed_register_name)
         )
             .perform(click())
-            .perform(typeTextIntoFocusedView(""))
+            .perform(typeTextIntoFocusedView(""), closeSoftKeyboard())
 
         // Retest button register state after input email
         testBtnRegisterInitState()
@@ -334,7 +334,7 @@ class RegistrationActivityTest{
             )
         )
             .perform(click())
-            .perform(typeTextIntoFocusedView(""))
+            .perform(typeTextIntoFocusedView(""), closeSoftKeyboard())
 
         // Retest button register state after input email
         testBtnRegisterInitState()
@@ -364,7 +364,7 @@ class RegistrationActivityTest{
             withId(R.id.ed_register_name)
         )
             .perform(click())
-            .perform(typeTextIntoFocusedView(""))
+            .perform(typeTextIntoFocusedView(""), closeSoftKeyboard())
 
         // Retest button register state after input email
         testBtnRegisterInitState()
@@ -377,7 +377,7 @@ class RegistrationActivityTest{
             )
         )
             .perform(click())
-            .perform(typeTextIntoFocusedView("email"))
+            .perform(typeTextIntoFocusedView("email"), closeSoftKeyboard())
 
         // Retest button register state after input email
         testBtnRegisterInitState()
@@ -414,7 +414,7 @@ class RegistrationActivityTest{
             withId(R.id.ed_register_name)
         )
             .perform(click())
-            .perform(typeTextIntoFocusedView(name))
+            .perform(typeTextIntoFocusedView(name), closeSoftKeyboard())
 
         // Retest button register state after input email
         testBtnRegisterInitState()
@@ -427,7 +427,7 @@ class RegistrationActivityTest{
             )
         )
             .perform(click())
-            .perform(typeTextIntoFocusedView(email))
+            .perform(typeTextIntoFocusedView(email), closeSoftKeyboard())
 
         // Retest button register state after input email
         testBtnRegisterInitState()

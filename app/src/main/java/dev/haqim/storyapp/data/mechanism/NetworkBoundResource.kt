@@ -15,22 +15,30 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
         emit(Resource.Loading())
         wrapEspressoIdlingResource {
             try {
-                val apiResponse = fetchFromRemote().first()
-                if(apiResponse.isSuccess){
-                    apiResponse.getOrNull()?.let { res ->
-                        saveRemoteData(res)
-                        emitAll(
-                            loadResultData(res).map {
-                                Resource.Success(it)
-                            }
-                        )
+                when(val apiResponse = fetchFromRemote().first()){
+                    is HttpResult.Success -> {
+                        apiResponse.data?.let {
+                            saveRemoteData(it)
+                            emitAll(
+                                loadResultData(it).map {res ->
+                                    Resource.Success(res)
+                                }
+                            )
+                        }
                     }
-
-                }else{
-                    onFetchFailed()
-                    emit(Resource.Error(
-                        message = apiResponse.exceptionOrNull()?.localizedMessage ?: "Unknown error"
-                    ))
+                    is HttpResult.Unauthorized -> {
+                        onFetchFailed()
+                        resetUserAuth()
+                        emit(Resource.Error(
+                            message = apiResponse.message ?: "Unknown error"
+                        ))
+                    }
+                    else -> {
+                        onFetchFailed()
+                        emit(Resource.Error(
+                            message = apiResponse.message ?: "Unknown error"
+                        ))
+                    }
                 }
             }catch (e: Exception){
                 onFetchFailed()
@@ -41,11 +49,13 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
         }
     }
     
-    protected abstract fun fetchFromRemote(): Flow<Result<RequestType>>
+    protected abstract fun fetchFromRemote(): Flow<HttpResult<RequestType>>
     
     protected abstract fun loadResultData(data: RequestType): Flow<ResultType>
     
     protected abstract suspend fun saveRemoteData(data: RequestType)
+    
+    protected abstract suspend fun resetUserAuth()
     
     protected open fun onFetchFailed() {}
     fun asFlow(): Flow<Resource<ResultType>> = result

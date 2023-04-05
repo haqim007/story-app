@@ -11,19 +11,23 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.actionWithAssertions
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import com.google.android.material.textfield.TextInputLayout
 import dev.haqim.storyapp.ui.custom_view.CustomPasswordEditText
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.StringDescription
 import org.hamcrest.TypeSafeMatcher
+import java.util.concurrent.TimeoutException
 
 
 fun textInputLayoutHintText(expectedHintText: String): Matcher<View>{
@@ -167,6 +171,19 @@ fun waitUntil(matcher: Matcher<View?>): ViewAction? {
             }
         }
     })
+}
+
+fun waitUntil(matcher: Matcher<View>, timeout: Long) {
+    val endTime = System.currentTimeMillis() + timeout
+    do {
+        try {
+            onView(matcher).check(matches(isDisplayed()))
+            return
+        } catch (e: Exception) {
+            // Ignore exceptions and keep waiting
+        }
+    } while (System.currentTimeMillis() < endTime)
+    throw TimeoutException("Waited for $timeout ms but condition not met")
 }
 
 private class LayoutChangeCallback(private val matcher: Matcher<View?>) :

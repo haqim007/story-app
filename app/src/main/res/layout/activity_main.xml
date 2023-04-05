@@ -21,17 +21,6 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_main" />
 
-        <ProgressBar
-            android:id="@+id/pb_loader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminateTint="@color/color_primary"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:visibility="gone"
-            tools:visibility="visible"/>
 
         <TextView
             android:id="@+id/tv_error"
@@ -43,7 +32,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="error"
             android:textSize="18sp"
-            android:textAllCaps="false"
+            style="@style/TextLower"
             android:visibility="gone"
             tools:visibility="visible"/>
 
@@ -64,7 +53,7 @@
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/ic_map_24"
             android:text="@string/map"
-            android:textAllCaps="false"
+            style="@style/Button.TextLower"
             android:background="@drawable/button_show_map_background"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

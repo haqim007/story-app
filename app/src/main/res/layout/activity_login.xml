@@ -89,12 +89,11 @@
 
         <Button
             android:id="@+id/btn_signup"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/TextButton.TextLower"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:text="@string/not_registered_yet_question"
-            android:textAllCaps="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/ed_login_password"
             app:layout_constraintStart_toStartOf="@+id/ed_login_password" />

@@ -100,7 +100,7 @@ class LoginActivityTest {
         // Input valid email
         onView(allOf(withId(R.id.ed_login_email), withHint(R.string.email)))
             .perform(click())
-            .perform(typeTextIntoFocusedView(email))
+            .perform(typeTextIntoFocusedView(email), closeSoftKeyboard())
             .check(matches(not(textInputLayoutErrorText(appContext.getString(R.string.email_is_required)))))
             .check(matches(not(textInputLayoutErrorText(appContext.getString(R.string.email_format_is_invalid)))))
 
@@ -120,6 +120,8 @@ class LoginActivityTest {
         onView(withId(R.id.btnLogin))
             .check(matches(isDisplayed()))
             .perform(click())
+        
+        Thread.sleep(5000)
 
         // Test button login in loading state
         testBtnLoginOnLoading()
@@ -169,7 +171,7 @@ class LoginActivityTest {
         // Input valid email
         onView(allOf(withId(R.id.ed_login_email), withHint(R.string.email)))
             .perform(click())
-            .perform(typeTextIntoFocusedView("email"))
+            .perform(typeTextIntoFocusedView("email"), closeSoftKeyboard())
 
         // Retest button login state after input email
         testBtnLoginInitState()
@@ -193,7 +195,7 @@ class LoginActivityTest {
         // Input valid email
         onView(allOf(withId(R.id.ed_login_email), withHint(R.string.email)))
             .perform(click())
-            .perform(typeTextIntoFocusedView("email"))
+            .perform(typeTextIntoFocusedView("email"), closeSoftKeyboard())
 
         // Retest button login state after input email
         testBtnLoginInitState()
@@ -241,7 +243,7 @@ class LoginActivityTest {
         // Input valid email
         onView(allOf(withId(R.id.ed_login_email), withHint(R.string.email)))
             .perform(click())
-            .perform(typeTextIntoFocusedView(""))
+            .perform(typeTextIntoFocusedView(""), closeSoftKeyboard())
 
         // Retest button login state after input email
         testBtnLoginInitState()
