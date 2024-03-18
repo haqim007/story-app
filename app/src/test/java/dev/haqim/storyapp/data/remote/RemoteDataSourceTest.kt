@@ -11,6 +11,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.*
@@ -208,12 +210,24 @@ class RemoteDataSourceTest {
             flowOf(token)
         )
 
-        `when`(service.addNewStory(
-            requestBody.multipartRequestBody(file), 
-            requestBody.textPlainRequestBody(description),
-            requestBody.textPlainRequestBody(lon.toString()), 
-            requestBody.textPlainRequestBody(lat.toString()),
-            token
+        val fileRequestBody = RequestBodyUtil.multipartRequestBody(file)
+        val descriptionRequestBody = RequestBodyUtil.textPlainRequestBody(description)
+        val lonRequestBody = RequestBodyUtil.textPlainRequestBodyNullable(lon.toString())
+        val latRequestBody = RequestBodyUtil.textPlainRequestBodyNullable(lat.toString())
+
+        `when`(requestBody.multipartRequestBody(file)).thenReturn(fileRequestBody)
+        `when`(requestBody.textPlainRequestBody(description)).thenReturn(descriptionRequestBody)
+        `when`(requestBody.textPlainRequestBodyNullable(lon.toString())).thenReturn(lonRequestBody)
+        `when`(requestBody.textPlainRequestBodyNullable(lat.toString())).thenReturn(latRequestBody)
+
+
+        `when`(
+            service.addNewStory(
+                fileRequestBody,
+                descriptionRequestBody,
+                latRequestBody,
+                lonRequestBody,
+                token
             )
         )
             .thenReturn(
@@ -223,20 +237,23 @@ class RemoteDataSourceTest {
         remoteDataSource = RemoteDataSource(service, userPreference, requestBody)
 
         remoteDataSource.addStory(file, description, lon, lat).test {
-            verify(service).addNewStory(
-                requestBody.multipartRequestBody(file),
-                requestBody.textPlainRequestBody(description),
-                requestBody.textPlainRequestBody(lon.toString()),
-                requestBody.textPlainRequestBody(lat.toString()),
-                token
-            )
 
             val successEmission = awaitItem()
             assertTrue(successEmission is HttpResult.Success)
+            println(successEmission.message)
             assertEquals(DataDummy.basicResponseSuccess(), successEmission.data)
 
             cancelAndIgnoreRemainingEvents()
         }
+
+        verify(service).addNewStory(
+            fileRequestBody,
+            descriptionRequestBody,
+            latRequestBody,
+            lonRequestBody,
+            token
+        )
+
     }
 
     @Test
