@@ -11,11 +11,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -270,16 +270,27 @@ class RemoteDataSourceTest {
         "}").toResponseBody("plain/text".toMediaTypeOrNull())
         ))
 
+        val fileRequestBody = RequestBodyUtil.multipartRequestBody(file)
+        val descriptionRequestBody = RequestBodyUtil.textPlainRequestBody(description)
+        val lonRequestBody = RequestBodyUtil.textPlainRequestBodyNullable(lon.toString())
+        val latRequestBody = RequestBodyUtil.textPlainRequestBodyNullable(lat.toString())
+
+        `when`(requestBody.multipartRequestBody(file)).thenReturn(fileRequestBody)
+        `when`(requestBody.textPlainRequestBody(description)).thenReturn(descriptionRequestBody)
+        `when`(requestBody.textPlainRequestBodyNullable(lon.toString())).thenReturn(lonRequestBody)
+        `when`(requestBody.textPlainRequestBodyNullable(lat.toString())).thenReturn(latRequestBody)
+
         `when`(userPreference.getUserToken()).thenReturn(
             flowOf(token)
         )
 
-        `when`(service.addNewStory(
-            requestBody.multipartRequestBody(file),
-            requestBody.textPlainRequestBody(description),
-            requestBody.textPlainRequestBody(lon.toString()),
-            requestBody.textPlainRequestBody(lat.toString()),
-            token
+        `when`(
+            service.addNewStory(
+                fileRequestBody,
+                descriptionRequestBody,
+                latRequestBody,
+                lonRequestBody,
+                token
             )
         ).thenThrow(exception)
 
@@ -287,10 +298,10 @@ class RemoteDataSourceTest {
 
         remoteDataSource.addStory(file, description, lon, lat).test {
             verify(service).addNewStory(
-                requestBody.multipartRequestBody(file),
-                requestBody.textPlainRequestBody(description),
-                requestBody.textPlainRequestBody(lon.toString()),
-                requestBody.textPlainRequestBody(lat.toString()),
+                fileRequestBody,
+                descriptionRequestBody,
+                latRequestBody,
+                lonRequestBody,
                 token
             )
 
